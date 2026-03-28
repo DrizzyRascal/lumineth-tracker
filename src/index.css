@@ -1,24 +1,137 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* ── CSS Custom Properties ──────────────────────────────────────────────── */
+:root {
+  /* Backgrounds */
+  --bg-page:    #f0ece0;
+  --bg-card:    #ffffff;
+  --bg-modal:   #faf7f0;
+  --bg-subtle:  #f5f1e8;
+  --bg-muted:   #fdf9f2;
+  --bg-input:   #ffffff;
+
+  /* Accent-tinted backgrounds */
+  --bg-accent-faint:  rgba(122,82,10,0.05);
+  --bg-accent-soft:   rgba(122,82,10,0.07);
+  --bg-accent-medium: rgba(122,82,10,0.08);
+
+  /* Text */
+  --text-primary:     #1a1614;
+  --text-body:        #2e2820;
+  --text-secondary:   #5a4e3a;
+  --text-muted:       #8a7d65;
+  --text-dim:         #a89878;
+  --text-placeholder: #b0a080;
+
+  /* Borders */
+  --border:        #d4c9a8;
+  --border-subtle: #e8e0cc;
+  --border-medium: #e0d8c4;
+  --border-faint:  #eee9dc;
+
+  /* Accent borders */
+  --border-accent-faint:    rgba(122,82,10,0.15);
+  --border-accent:          rgba(122,82,10,0.20);
+  --border-accent-strong:   rgba(122,82,10,0.25);
+  --border-accent-stronger: rgba(122,82,10,0.30);
+
+  /* Brand */
+  --accent:       #7a520a;
+  --accent-dim:   #c4b98a;
+  --accent-bright:#9a5f0a;
+
+  /* Shadow */
+  --shadow-card:  0 1px 3px rgba(0,0,0,0.04);
+  --shadow-panel: 0 1px 4px rgba(0,0,0,0.06);
+  --shadow-modal: 0 -4px 24px rgba(0,0,0,0.18);
+}
+
+[data-theme="dark"] {
+  --bg-page:    #161210;
+  --bg-card:    #211e18;
+  --bg-modal:   #252018;
+  --bg-subtle:  #1c1910;
+  --bg-muted:   #1e1b13;
+  --bg-input:   #1a1710;
+
+  --bg-accent-faint:  rgba(196,148,60,0.07);
+  --bg-accent-soft:   rgba(196,148,60,0.10);
+  --bg-accent-medium: rgba(196,148,60,0.12);
+
+  --text-primary:     #e8e0cc;
+  --text-body:        #d4c9a8;
+  --text-secondary:   #c4b98a;
+  --text-muted:       #8a7d65;
+  --text-dim:         #6b604a;
+  --text-placeholder: #5a5040;
+
+  --border:        #3a3025;
+  --border-subtle: #2e2820;
+  --border-medium: #332c20;
+  --border-faint:  #252018;
+
+  --border-accent-faint:    rgba(196,148,60,0.18);
+  --border-accent:          rgba(196,148,60,0.22);
+  --border-accent-strong:   rgba(196,148,60,0.28);
+  --border-accent-stronger: rgba(196,148,60,0.35);
+
+  --accent:       #c4943c;
+  --accent-dim:   #7a6840;
+  --accent-bright:#c4943c;
+
+  --shadow-card:  0 1px 3px rgba(0,0,0,0.22);
+  --shadow-panel: 0 1px 4px rgba(0,0,0,0.28);
+  --shadow-modal: 0 -4px 24px rgba(0,0,0,0.55);
+}
+
+/* ── Base ──────────────────────────────────────────────────────────────── */
 body {
-  background: #f0ece0;
+  background: var(--bg-page);
   font-family: 'Crimson Pro', Georgia, serif;
-  color: #1a1614;
+  color: var(--text-primary);
   -webkit-tap-highlight-color: transparent;
 }
 
 ::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: #ede8dc; }
-::-webkit-scrollbar-thumb { background: #c4b98a; border-radius: 3px; }
+::-webkit-scrollbar-track { background: var(--bg-subtle); }
+::-webkit-scrollbar-thumb { background: var(--accent-dim); border-radius: 3px; }
 
+input::placeholder { color: var(--text-placeholder); }
+input:focus { outline: 2px solid var(--accent-bright) !important; }
+
+/* ── Component helpers ─────────────────────────────────────────────────── */
 .lrl-btn { transition: filter .15s, transform .1s; cursor: pointer; }
 .lrl-btn:hover { filter: brightness(.92); }
 .lrl-btn:active { transform: scale(.97); filter: brightness(.85); }
 
-.lrl-tab:hover { color: #7a520a !important; }
+[data-theme="dark"] .lrl-btn:hover { filter: brightness(1.12); }
+[data-theme="dark"] .lrl-btn:active { filter: brightness(1.22); }
+
+.lrl-tab:hover { color: var(--accent) !important; }
 .lrl-rune-pick:active { transform: scale(.98); }
 .lrl-unit-card { transition: box-shadow .2s; }
 .lrl-entry:hover .lrl-rmv { opacity: 1 !important; }
 
-input::placeholder { color: #b0a080; }
-input:focus { outline: 2px solid #9a5f0a !important; }
+/* ── Mobile ────────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .lrl-unit-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .lrl-round-bar {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+  .lrl-round-btns {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+/* ── Colorblind rune label ─────────────────────────────────────────────── */
+.lrl-rune-chip-label {
+  font-size: 10px;
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}

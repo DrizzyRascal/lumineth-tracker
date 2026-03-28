@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import store from './store.js';
 import { uid } from './utils.js';
 import { RUNE_ORDER } from './data.js';
@@ -13,8 +13,15 @@ import StartModal from './components/StartModal.jsx';
 import AddRuneModal from './components/AddRuneModal.jsx';
 import AcolytePickModal from './components/AcolytePickModal.jsx';
 import TeclisDiscsModal from './components/TeclisDiscsModal.jsx';
+import RoundChecklistModal from './components/RoundChecklistModal.jsx';
+import BattleSummaryModal from './components/BattleSummaryModal.jsx';
 
-const VERSION = '28 Mar 2026, 16:58 UTC';
+const VERSION = 'v1.1 · 28 Mar 2026';
+
+// ── Button style helpers ──────────────────────────────────────────────────────
+const btnPrimary   = { fontFamily: 'Cinzel,serif', fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', padding: '13px 18px', background: 'var(--accent)', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 700, borderRadius: 6 };
+const btnSecondary = { fontFamily: 'Cinzel,serif', fontSize: 12, letterSpacing: '0.1em',  textTransform: 'uppercase', padding: '13px 18px', background: 'var(--bg-card)', color: 'var(--text-secondary)', border: '1px solid var(--border)', cursor: 'pointer', borderRadius: 6 };
+const btnGhost     = { fontFamily: 'Cinzel,serif', fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '13px 14px', background: 'transparent', color: 'var(--text-dim)', border: '1px solid var(--border-subtle)', cursor: 'pointer', borderRadius: 6 };
 
 export default function App() {
   const [tab,           setTab]           = useState('game');
@@ -29,18 +36,28 @@ export default function App() {
   const [expandedId,    setExpandedId]    = useState(null);
   const [selectedLores, setSelectedLores] = useState([]);
   const [loaded,        setLoaded]        = useState(false);
+  const [theme,         setTheme]         = useState('light');
+  const [saves,         setSaves]         = useState([]);
+  const importRef = useRef(null);
 
   // ── Persistence ───────────────────────────────────────────────────────────
   useEffect(() => {
     const r = store.get('lrl_roster'); if (r) try { setRoster(JSON.parse(r.value)); } catch {}
     const g = store.get('lrl_game');   if (g) try { setGame(JSON.parse(g.value));   } catch {}
     const l = store.get('lrl_lores');  if (l) try { setSelectedLores(JSON.parse(l.value)); } catch {}
+    const t = store.get('lrl_theme');  if (t) setTheme(t.value === 'dark' ? 'dark' : 'light');
+    const s = store.get('lrl_saves');  if (s) try { setSaves(JSON.parse(s.value)); } catch {}
     setLoaded(true);
   }, []);
 
   useEffect(() => { if (!loaded) return; store.set('lrl_roster', JSON.stringify(roster)); }, [roster, loaded]);
   useEffect(() => { if (!loaded || game === null) return; store.set('lrl_game', JSON.stringify(game)); }, [game, loaded]);
   useEffect(() => { if (!loaded) return; store.set('lrl_lores', JSON.stringify(selectedLores)); }, [selectedLores, loaded]);
+  useEffect(() => { if (!loaded) return; store.set('lrl_theme', theme); }, [theme, loaded]);
+  useEffect(() => { if (!loaded) return; store.set('lrl_saves', JSON.stringify(saves)); }, [saves, loaded]);
+
+  // ── Theme ─────────────────────────────────────────────────────────────────
+  const toggleTheme = () => setTheme(t => t === 'light' ? 'dark' : 'light');
 
   // ── Roster ────────────────────────────────────────────────────────────────
   const addUnit    = () => { const n = newUnitName.trim(); if (!n) return; setRoster(r => [...r, { id: uid(), name: n }]); setNewUnitName(''); };
@@ -54,9 +71,21 @@ export default function App() {
       sevirethAuraOn: false, lyriorAuraOn: false, avalenorAuraOn: false });
     setModal(null);
   };
-  const endGame    = () => { setGame(null); store.del('lrl_game'); };
-  const nextRound  = () => { setGame(g => ({ ...g, round: g.round + 1 })); setExpandedId(null); };
+  const openEndGame = () => setModal('battle-summary');
+  const endGame     = () => { setGame(null); store.del('lrl_game'); setModal(null); };
+  const openNextRound = () => setModal('round-checklist');
+  const confirmNextRound = () => { setGame(g => ({ ...g, round: g.round + 1 })); setExpandedId(null); setModal(null); };
   const removeEntry = (id) => setGame(g => ({ ...g, battleScripture: g.battleScripture.filter(e => e.id !== id) }));
+
+  // ── Undo last rune ─────────────────────────────────────────────────────────
+  const undoLastRune = () => {
+    setGame(g => {
+      if (!g || g.battleScripture.length === 0) return g;
+      const next = [...g.battleScripture];
+      next.pop();
+      return { ...g, battleScripture: next };
+    });
+  };
 
   // ── Depict Rune ───────────────────────────────────────────────────────────
   const openDepict  = () => { setAddStep(1); setPendingRune(null); setPendingUnits([]); setModal('add-rune'); };
@@ -69,7 +98,6 @@ export default function App() {
     }));
     setModal(null);
   };
-
   const confirmTeclisDiscs = (runeId) => {
     setGame(g => ({
       ...g, teclisDiscsUsed: true,
@@ -88,28 +116,88 @@ export default function App() {
     return [...s, id];
   });
 
+  // ── Export / Import ────────────────────────────────────────────────────────
+  const exportState = () => {
+    const data = { roster, game, selectedLores, exportedAt: new Date().toISOString(), version: VERSION };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `lumineth-tracker-${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+  const importState = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (data.roster) setRoster(data.roster);
+        if (data.game !== undefined) setGame(data.game);
+        if (data.selectedLores) setSelectedLores(data.selectedLores);
+      } catch { alert('Could not read file — invalid format.'); }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
+
+  // ── Battle Saves ──────────────────────────────────────────────────────────
+  const saveCurrentBattle = () => {
+    if (!game) return;
+    const name = `Round ${game.round} — ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+    const entry = { id: uid(), name, savedAt: new Date().toISOString(), roster, game, selectedLores };
+    setSaves(s => [entry, ...s]);
+  };
+  const loadSave = (save) => {
+    if (save.roster) setRoster(save.roster);
+    if (save.game !== undefined) setGame(save.game);
+    if (save.selectedLores) setSelectedLores(save.selectedLores);
+  };
+  const deleteSave = (id) => setSaves(s => s.filter(sv => sv.id !== id));
+
   // ── Derived ───────────────────────────────────────────────────────────────
   const activeUnits     = game ? roster.filter(u => game.activeUnitIds.includes(u.id)) : [];
   const allScriptureIds = game ? new Set(game.battleScripture.map(e => e.runeId)) : new Set();
   const uniqueRuneCount = allScriptureIds.size;
+  const canUndo         = game && game.battleScripture.length > 0;
 
   return (
-    <div style={{ fontFamily: "'Crimson Pro', Georgia, serif", background: '#f0ece0', minHeight: '100vh', color: '#1a1614' }}>
+    <div data-theme={theme}
+      style={{ fontFamily: "'Crimson Pro', Georgia, serif", background: 'var(--bg-page)', minHeight: '100vh', color: 'var(--text-primary)' }}>
 
       {/* ── HEADER ── */}
-      <header style={{ background: '#fff', borderBottom: '1px solid #d4c9a8', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', position: 'sticky', top: 0, zIndex: 10 }}>
+      <header style={{ background: 'var(--bg-card)', borderBottom: '1px solid var(--border)', boxShadow: 'var(--shadow-panel)', position: 'sticky', top: 0, zIndex: 10 }}>
         <div style={{ maxWidth: 860, margin: '0 auto', padding: '0 16px' }}>
           <div style={{ paddingTop: 14, paddingBottom: 2 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-              <div style={{ fontFamily: 'Cinzel,serif', fontSize: 9, letterSpacing: '0.28em', color: '#a89878', textTransform: 'uppercase' }}>Warhammer Age of Sigmar</div>
-              <div style={{ fontFamily: 'Cinzel,serif', fontSize: 9, color: '#c4b98a', letterSpacing: '0.05em' }}>Updated {VERSION}</div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: 6 }}>
+              <div style={{ fontFamily: 'Cinzel,serif', fontSize: 9, letterSpacing: '0.28em', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Warhammer Age of Sigmar</div>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                {/* Export / Import */}
+                <button onClick={exportState} title="Export state as JSON"
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-dim)', fontSize: 11, fontFamily: 'Cinzel,serif', letterSpacing: '0.06em', padding: '2px 4px' }}
+                  aria-label="Export state">↑ Export</button>
+                <button onClick={() => importRef.current?.click()} title="Import state from JSON"
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-dim)', fontSize: 11, fontFamily: 'Cinzel,serif', letterSpacing: '0.06em', padding: '2px 4px' }}
+                  aria-label="Import state">↓ Import</button>
+                <input ref={importRef} type="file" accept=".json" onChange={importState} style={{ display: 'none' }} />
+                {/* Theme toggle */}
+                <button onClick={toggleTheme} aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+                  title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-dim)', fontSize: 14, padding: '2px 4px', lineHeight: 1 }}>
+                  {theme === 'light' ? '◐' : '☀'}
+                </button>
+                <div style={{ fontFamily: 'Cinzel,serif', fontSize: 9, color: 'var(--accent-dim)', letterSpacing: '0.05em' }}>{VERSION}</div>
+              </div>
             </div>
-            <div style={{ fontFamily: 'Cinzel,serif', fontSize: 19, fontWeight: 700, color: '#7a520a', letterSpacing: '0.04em', marginTop: 1 }}>Lumineth Realm-lords</div>
+            <div style={{ fontFamily: 'Cinzel,serif', fontSize: 19, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.04em', marginTop: 1 }}>Lumineth Realm-lords</div>
           </div>
           <div style={{ display: 'flex', marginTop: 10 }}>
             {[['game', 'Battle'], ['spells', 'Spells'], ['roster', 'Roster']].map(([key, label]) => (
               <button key={key} className="lrl-tab" onClick={() => setTab(key)}
-                style={{ fontFamily: 'Cinzel,serif', fontSize: 12, letterSpacing: '0.15em', textTransform: 'uppercase', padding: '10px 20px', background: 'transparent', border: 'none', borderBottom: tab === key ? '2px solid #7a520a' : '2px solid transparent', color: tab === key ? '#7a520a' : '#a89878', cursor: 'pointer', marginBottom: -1, fontWeight: tab === key ? 700 : 400, minHeight: 44 }}>
+                aria-current={tab === key ? 'page' : undefined}
+                style={{ fontFamily: 'Cinzel,serif', fontSize: 12, letterSpacing: '0.15em', textTransform: 'uppercase', padding: '10px 20px', background: 'transparent', border: 'none', borderBottom: tab === key ? `2px solid var(--accent)` : '2px solid transparent', color: tab === key ? 'var(--accent)' : 'var(--text-dim)', cursor: 'pointer', marginBottom: -1, fontWeight: tab === key ? 700 : 400, minHeight: 44 }}>
                 {label}
               </button>
             ))}
@@ -132,52 +220,85 @@ export default function App() {
             game={game} roster={roster} />
         )}
 
-        {/* BATTLE TAB */}
+        {/* BATTLE TAB — no active game */}
         {tab === 'game' && !game && (
-          <div style={{ textAlign: 'center', padding: '48px 20px' }}>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginBottom: 28, opacity: 0.18 }}>
-              {RUNE_ORDER.map(id => <RuneSymbol key={id} runeId={id} size={50} active />)}
-            </div>
-            <div style={{ fontFamily: 'Cinzel,serif', fontSize: 20, color: '#a89878', marginBottom: 8 }}>No Active Battle</div>
-            <div style={{ fontSize: 15, color: '#b0a080', marginBottom: 32 }}>
+          <div>
+            <div style={{ textAlign: 'center', padding: '48px 20px' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginBottom: 28, opacity: 0.18 }}>
+                {RUNE_ORDER.map(id => <RuneSymbol key={id} runeId={id} size={50} active />)}
+              </div>
+              <div style={{ fontFamily: 'Cinzel,serif', fontSize: 20, color: 'var(--text-dim)', marginBottom: 8 }}>No Active Battle</div>
+              <div style={{ fontSize: 15, color: 'var(--text-placeholder)', marginBottom: 32 }}>
+                {roster.length === 0
+                  ? 'Add units to your roster, then begin a battle.'
+                  : 'Select your deployed units and begin tracking.'}
+              </div>
               {roster.length === 0
-                ? 'Add units to your roster, then begin a battle.'
-                : 'Select your deployed units and begin tracking.'}
+                ? <button className="lrl-btn" onClick={() => setTab('roster')}
+                  style={{ ...btnSecondary, fontSize: 12 }}>
+                  Build Roster
+                </button>
+                : <button className="lrl-btn" onClick={openStartGame}
+                  style={{ ...btnPrimary, padding: '16px 32px' }}>
+                  Begin Battle
+                </button>
+              }
             </div>
-            {roster.length === 0
-              ? <button className="lrl-btn" onClick={() => setTab('roster')}
-                style={{ fontFamily: 'Cinzel,serif', fontSize: 12, letterSpacing: '0.15em', textTransform: 'uppercase', padding: '14px 28px', background: 'transparent', color: '#7a520a', border: '2px solid #7a520a', cursor: 'pointer', fontWeight: 600, borderRadius: 6 }}>
-                Build Roster
-              </button>
-              : <button className="lrl-btn" onClick={openStartGame}
-                style={{ fontFamily: 'Cinzel,serif', fontSize: 12, letterSpacing: '0.15em', textTransform: 'uppercase', padding: '16px 32px', background: '#7a520a', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 700, borderRadius: 6 }}>
-                Begin Battle
-              </button>
-            }
+
+            {/* Saved battles */}
+            {saves.length > 0 && (
+              <div style={{ marginTop: 8 }}>
+                <div style={{ fontFamily: 'Cinzel,serif', fontSize: 10, letterSpacing: '0.28em', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 12 }}>Saved Battles</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {saves.map(sv => (
+                    <div key={sv.id} style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--bg-card)', border: '1px solid var(--border)', padding: '12px 16px', borderRadius: 6 }}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 14, color: 'var(--text-primary)', fontFamily: 'Cinzel,serif', fontWeight: 600 }}>{sv.name}</div>
+                        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
+                          {sv.roster?.length ?? 0} units · saved {new Date(sv.savedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                        </div>
+                      </div>
+                      <button className="lrl-btn" onClick={() => loadSave(sv)}
+                        style={{ fontFamily: 'Cinzel,serif', fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '7px 14px', background: 'var(--bg-accent-faint)', color: 'var(--accent)', border: '1px solid var(--border-accent-faint)', cursor: 'pointer', borderRadius: 4, whiteSpace: 'nowrap' }}>
+                        Load
+                      </button>
+                      <button onClick={() => deleteSave(sv.id)} aria-label={`Delete save: ${sv.name}`}
+                        style={{ background: 'none', border: 'none', color: 'var(--accent-dim)', cursor: 'pointer', fontSize: 20, lineHeight: 1, padding: '0 4px', minWidth: 36, minHeight: 36, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        onMouseEnter={e => e.currentTarget.style.color = '#b84040'}
+                        onMouseLeave={e => e.currentTarget.style.color = 'var(--accent-dim)'}>×</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
+        {/* BATTLE TAB — active game */}
         {tab === 'game' && game && (
           <div>
             {/* Round bar */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
+            <div className="lrl-round-bar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
               <div>
-                <div style={{ fontFamily: 'Cinzel,serif', fontSize: 10, letterSpacing: '0.3em', color: '#a89878', textTransform: 'uppercase' }}>Battle Round</div>
-                <div style={{ fontFamily: 'Cinzel,serif', fontSize: 52, fontWeight: 700, color: '#7a520a', lineHeight: 1 }}>{game.round}</div>
+                <div style={{ fontFamily: 'Cinzel,serif', fontSize: 10, letterSpacing: '0.3em', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Battle Round</div>
+                <div style={{ fontFamily: 'Cinzel,serif', fontSize: 52, fontWeight: 700, color: 'var(--accent)', lineHeight: 1 }}>{game.round}</div>
               </div>
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                <button className="lrl-btn" onClick={openDepict}
-                  style={{ fontFamily: 'Cinzel,serif', fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', padding: '13px 18px', background: '#7a520a', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 700, borderRadius: 6 }}>
-                  ✦ Depict Rune
+              <div className="lrl-round-btns" style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                <button className="lrl-btn" onClick={openDepict} style={btnPrimary}>✦ Depict Rune</button>
+                {canUndo && (
+                  <button className="lrl-btn" onClick={undoLastRune} title="Undo last depicted rune"
+                    style={{ ...btnSecondary, padding: '13px 14px' }}
+                    aria-label="Undo last depicted rune">
+                    ↩ Undo
+                  </button>
+                )}
+                <button className="lrl-btn" onClick={openNextRound} style={btnSecondary}>Next Round →</button>
+                <button className="lrl-btn" onClick={saveCurrentBattle} title="Save current battle state"
+                  style={{ ...btnGhost, fontSize: 11 }}
+                  aria-label="Save current battle">
+                  ✦ Save
                 </button>
-                <button className="lrl-btn" onClick={nextRound}
-                  style={{ fontFamily: 'Cinzel,serif', fontSize: 12, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '13px 18px', background: '#fff', color: '#5a4e3a', border: '1px solid #d4c9a8', cursor: 'pointer', borderRadius: 6 }}>
-                  Next Round →
-                </button>
-                <button className="lrl-btn" onClick={endGame}
-                  style={{ fontFamily: 'Cinzel,serif', fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '13px 14px', background: 'transparent', color: '#b0a080', border: '1px solid #e0d8c4', cursor: 'pointer', borderRadius: 6 }}>
-                  End
-                </button>
+                <button className="lrl-btn" onClick={openEndGame} style={btnGhost}>End</button>
               </div>
             </div>
 
@@ -190,10 +311,10 @@ export default function App() {
 
             <RulesBanner />
 
-            <div style={{ fontFamily: 'Cinzel,serif', fontSize: 10, letterSpacing: '0.28em', color: '#8a7d65', textTransform: 'uppercase', marginBottom: 12 }}>
+            <div style={{ fontFamily: 'Cinzel,serif', fontSize: 10, letterSpacing: '0.28em', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 12 }}>
               Unit Status — {activeUnits.length} deployed
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 10 }}>
+            <div className="lrl-unit-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 10 }}>
               {activeUnits.map(unit => (
                 <UnitCard key={unit.id} unit={unit} game={game} expandedId={expandedId} setExpandedId={setExpandedId} />
               ))}
@@ -219,6 +340,21 @@ export default function App() {
       )}
       {modal === 'teclis-discs' && game && (
         <TeclisDiscsModal game={game} confirmTeclisDiscs={confirmTeclisDiscs} onClose={() => setModal(null)} />
+      )}
+      {modal === 'round-checklist' && game && (
+        <RoundChecklistModal
+          currentRound={game.round}
+          nextRound={game.round + 1}
+          game={game}
+          onConfirm={confirmNextRound}
+          onClose={() => setModal(null)} />
+      )}
+      {modal === 'battle-summary' && game && (
+        <BattleSummaryModal
+          game={game}
+          activeUnits={activeUnits}
+          onConfirmEnd={endGame}
+          onClose={() => setModal(null)} />
       )}
     </div>
   );
