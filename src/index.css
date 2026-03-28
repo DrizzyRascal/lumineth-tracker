@@ -58,12 +58,12 @@
   --bg-accent-soft:   rgba(196,148,60,0.10);
   --bg-accent-medium: rgba(196,148,60,0.12);
 
-  --text-primary:     #e8e0cc;
-  --text-body:        #d4c9a8;
-  --text-secondary:   #c4b98a;
-  --text-muted:       #8a7d65;
-  --text-dim:         #6b604a;
-  --text-placeholder: #5a5040;
+  --text-primary:     #ede5d0;
+  --text-body:        #ddd0ac;
+  --text-secondary:   #cfc090;
+  --text-muted:       #b8a880;
+  --text-dim:         #a09070;
+  --text-placeholder: #9a8870;
 
   --border:        #3a3025;
   --border-subtle: #2e2820;
@@ -75,13 +75,13 @@
   --border-accent-strong:   rgba(196,148,60,0.28);
   --border-accent-stronger: rgba(196,148,60,0.35);
 
-  --accent:       #c4943c;
-  --accent-dim:   #7a6840;
-  --accent-bright:#c4943c;
+  --accent:       #c9983f;
+  --accent-dim:   #9a8860;
+  --accent-bright:#d4a348;
 
-  --shadow-card:  0 1px 3px rgba(0,0,0,0.22);
-  --shadow-panel: 0 1px 4px rgba(0,0,0,0.28);
-  --shadow-modal: 0 -4px 24px rgba(0,0,0,0.55);
+  --shadow-card:  0 2px 8px rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.25);
+  --shadow-panel: 0 2px 10px rgba(0,0,0,0.40), 0 1px 3px rgba(0,0,0,0.30);
+  --shadow-modal: 0 -4px 32px rgba(0,0,0,0.65), 0 0 0 1px rgba(196,148,60,0.08);
 }
 
 /* ── Base ──────────────────────────────────────────────────────────────── */
@@ -90,22 +90,54 @@ body {
   font-family: 'Crimson Pro', Georgia, serif;
   color: var(--text-primary);
   -webkit-tap-highlight-color: transparent;
+  transition: background 0.25s, color 0.25s;
 }
 
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: var(--bg-subtle); }
 ::-webkit-scrollbar-thumb { background: var(--accent-dim); border-radius: 3px; }
 
+input, textarea, select {
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.25s;
+}
 input::placeholder { color: var(--text-placeholder); }
-input:focus { outline: 2px solid var(--accent-bright) !important; }
+input:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 2px var(--accent-bright) !important;
+  border-color: var(--accent-bright) !important;
+}
 
 /* ── Component helpers ─────────────────────────────────────────────────── */
-.lrl-btn { transition: filter .15s, transform .1s; cursor: pointer; }
-.lrl-btn:hover { filter: brightness(.92); }
+.lrl-btn {
+  transition: filter .18s, transform .12s, box-shadow .18s;
+  cursor: pointer;
+}
+.lrl-btn:hover {
+  filter: brightness(.92);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
 .lrl-btn:active { transform: scale(.97); filter: brightness(.85); }
 
-[data-theme="dark"] .lrl-btn:hover { filter: brightness(1.12); }
+[data-theme="dark"] .lrl-btn:hover {
+  filter: brightness(1.14);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.40);
+}
 [data-theme="dark"] .lrl-btn:active { filter: brightness(1.22); }
+
+/* ── Card & panel transitions ───────────────────────────────────────────── */
+.lrl-unit-card {
+  transition: box-shadow .2s, transform .15s;
+}
+.lrl-unit-card:hover {
+  box-shadow: var(--shadow-panel) !important;
+  transform: translateY(-1px);
+}
+
+/* ── Header backdrop ────────────────────────────────────────────────────── */
+header {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
 
 .lrl-tab:hover { color: var(--accent) !important; }
 .lrl-rune-pick:active { transform: scale(.98); }
