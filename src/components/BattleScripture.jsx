@@ -11,7 +11,7 @@ export default function BattleScripture({ game, activeUnits, allScriptureIds, un
   if (game.avalenorAuraOn)  virtualEntries.push({ runeId: 'alaithi', source: 'Avalenor' });
 
   return (
-    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', padding: 16, marginBottom: 6, borderRadius: 6, boxShadow: 'var(--shadow-panel)' }}>
+    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', padding: 20, marginBottom: 6, borderRadius: 14, boxShadow: 'var(--shadow-panel)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
         <div style={{ fontFamily: 'Cinzel,serif', fontSize: 10, letterSpacing: '0.28em', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Battle Scripture</div>
         <div style={{ fontSize: 12, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -23,7 +23,7 @@ export default function BattleScripture({ game, activeUnits, allScriptureIds, un
       </div>
 
       {/* Rune tracker row */}
-      <div style={{ display: 'flex', gap: 12, marginBottom: 14, padding: '10px 12px', background: 'var(--bg-subtle)', borderRadius: 4, border: '1px solid var(--border-subtle)', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 12, marginBottom: 14, padding: '12px 14px', background: 'var(--bg-subtle)', borderRadius: 10, border: '1px solid var(--border-subtle)', alignItems: 'flex-end', flexWrap: 'wrap' }}>
         {RUNE_ORDER.map(id => {
           const on = allScriptureIds.has(id);
           const now = currentRoundIds.has(id);
@@ -55,7 +55,7 @@ export default function BattleScripture({ game, activeUnits, allScriptureIds, un
             const units = activeUnits.filter(u => entry.unitIds.includes(u.id));
             return (
               <div key={entry.id} className="lrl-entry"
-                style={{ background: isNow ? rune.bg : isTeclis ? 'var(--bg-accent-faint)' : 'var(--bg-subtle)', border: `1px solid ${isNow ? rune.border : isTeclis ? 'var(--border-accent-faint)' : 'var(--border-subtle)'}`, padding: '10px 14px', display: 'flex', alignItems: 'flex-start', gap: 10, borderRadius: 4, opacity: isNow ? 1 : 0.7 }}>
+                style={{ background: isNow ? rune.bg : isTeclis ? 'var(--bg-accent-faint)' : 'var(--bg-subtle)', border: `1px solid ${isNow ? rune.border : isTeclis ? 'var(--border-accent-faint)' : 'var(--border-subtle)'}`, padding: '10px 14px', display: 'flex', alignItems: 'flex-start', gap: 10, borderRadius: 10, opacity: isNow ? 1 : 0.7 }}>
                 <RuneSymbol runeId={entry.runeId} size={28} active={isNow} />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>

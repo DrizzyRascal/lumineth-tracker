@@ -47,12 +47,12 @@
 }
 
 [data-theme="dark"] {
-  --bg-page:    #161210;
-  --bg-card:    #211e18;
-  --bg-modal:   #252018;
-  --bg-subtle:  #1c1910;
-  --bg-muted:   #1e1b13;
-  --bg-input:   #1a1710;
+  --bg-page:    #141210;
+  --bg-card:    #242018;
+  --bg-modal:   #272219;
+  --bg-subtle:  #1e1b14;
+  --bg-muted:   #201d15;
+  --bg-input:   #1c1914;
 
   --bg-accent-faint:  rgba(196,148,60,0.07);
   --bg-accent-soft:   rgba(196,148,60,0.10);

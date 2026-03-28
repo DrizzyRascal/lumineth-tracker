@@ -15,10 +15,10 @@ export default function UnitCard({ unit, game, expandedId, setExpandedId }) {
     <div className="lrl-unit-card"
       onClick={() => interactive && setExpandedId(isExpanded ? null : unit.id)}
       aria-expanded={interactive ? isExpanded : undefined}
-      style={{ background: 'var(--bg-card)', border: `1px solid ${interactive ? 'var(--border)' : 'var(--border-faint)'}`, padding: 14, cursor: interactive ? 'pointer' : 'default', borderRadius: 6, boxShadow: 'var(--shadow-card)', position: 'relative' }}>
+      style={{ background: 'var(--bg-card)', border: `1px solid ${interactive ? 'var(--border)' : 'var(--border-faint)'}`, padding: 16, cursor: interactive ? 'pointer' : 'default', borderRadius: 12, boxShadow: 'var(--shadow-card)', position: 'relative' }}>
 
       {isAcolyte && (
-        <div style={{ position: 'absolute', top: -1, right: -1, background: 'var(--accent)', color: '#fff', fontSize: 9, fontFamily: 'Cinzel,serif', padding: '2px 8px', borderRadius: '0 6px 0 6px', letterSpacing: '0.1em' }}>ACOLYTE</div>
+        <div style={{ position: 'absolute', top: -1, right: -1, background: 'var(--accent)', color: '#fff', fontSize: 9, fontFamily: 'Cinzel,serif', padding: '2px 8px', borderRadius: '0 12px 0 10px', letterSpacing: '0.1em' }}>ACOLYTE</div>
       )}
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: interactive ? 10 : 4 }}>
@@ -35,7 +35,7 @@ export default function UnitCard({ unit, game, expandedId, setExpandedId }) {
           {buffs.map(b => {
             const rune = RUNES[b.runeId];
             return (
-              <div key={b.key} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '5px 10px', background: rune.bg, border: `1px solid ${rune.border}`, borderRadius: 4 }}>
+              <div key={b.key} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '5px 10px', background: rune.bg, border: `1px solid ${rune.border}`, borderRadius: 8 }}>
                 <RuneSymbol runeId={b.runeId} size={14} active />
                 <span className="lrl-rune-chip-label" style={{ color: rune.color }}>{b.army && '★ '}{b.short}</span>
                 {b.enhanced?.length > 0 && <span style={{ fontSize: 10, color: rune.color, opacity: 0.7 }}>+{b.enhanced.length}</span>}
@@ -48,7 +48,7 @@ export default function UnitCard({ unit, game, expandedId, setExpandedId }) {
       {reminders && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
           {reminders.map((r, i) => (
-            <div key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '5px 10px', background: r.active ? 'rgba(92,58,158,0.08)' : 'var(--bg-subtle)', border: `1px solid ${r.active ? 'rgba(92,58,158,0.25)' : 'var(--border-medium)'}`, borderRadius: 4 }}>
+            <div key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '5px 10px', background: r.active ? 'rgba(92,58,158,0.08)' : 'var(--bg-subtle)', border: `1px solid ${r.active ? 'rgba(92,58,158,0.25)' : 'var(--border-medium)'}`, borderRadius: 8 }}>
               <RuneSymbol runeId="oreali" size={12} active={r.active} />
               <span style={{ fontSize: 11, color: r.active ? '#5c3a9e' : 'var(--text-muted)', fontFamily: 'Cinzel,serif', fontWeight: r.active ? 600 : 400 }}>{r.text}</span>
             </div>

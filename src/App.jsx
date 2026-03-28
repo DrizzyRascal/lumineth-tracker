@@ -19,9 +19,9 @@ import BattleSummaryModal from './components/BattleSummaryModal.jsx';
 const VERSION = 'v1.1 · 28 Mar 2026';
 
 // ── Button style helpers ──────────────────────────────────────────────────────
-const btnPrimary   = { fontFamily: 'Cinzel,serif', fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', padding: '13px 18px', background: 'var(--accent)', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 700, borderRadius: 6 };
-const btnSecondary = { fontFamily: 'Cinzel,serif', fontSize: 12, letterSpacing: '0.1em',  textTransform: 'uppercase', padding: '13px 18px', background: 'var(--bg-card)', color: 'var(--text-secondary)', border: '1px solid var(--border)', cursor: 'pointer', borderRadius: 6 };
-const btnGhost     = { fontFamily: 'Cinzel,serif', fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '13px 14px', background: 'transparent', color: 'var(--text-dim)', border: '1px solid var(--border-subtle)', cursor: 'pointer', borderRadius: 6 };
+const btnPrimary   = { fontFamily: 'Cinzel,serif', fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', padding: '13px 26px', background: 'linear-gradient(135deg, var(--accent-bright), var(--accent))', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 700, borderRadius: 10, boxShadow: '0 2px 10px rgba(0,0,0,0.22)' };
+const btnSecondary = { fontFamily: 'Cinzel,serif', fontSize: 12, letterSpacing: '0.1em',  textTransform: 'uppercase', padding: '13px 20px', background: 'var(--bg-card)', color: 'var(--text-secondary)', border: '1px solid var(--border)', cursor: 'pointer', borderRadius: 10 };
+const btnGhost     = { fontFamily: 'Cinzel,serif', fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '13px 14px', background: 'transparent', color: 'var(--text-muted)', border: '1px solid var(--border-subtle)', cursor: 'pointer', borderRadius: 10 };
 
 export default function App() {
   const [tab,           setTab]           = useState('game');
@@ -168,7 +168,7 @@ export default function App() {
       style={{ fontFamily: "'Crimson Pro', Georgia, serif", background: 'var(--bg-page)', minHeight: '100vh', color: 'var(--text-primary)' }}>
 
       {/* ── HEADER ── */}
-      <header style={{ background: 'var(--bg-card)', borderBottom: '1px solid var(--border)', boxShadow: 'var(--shadow-panel)', position: 'sticky', top: 0, zIndex: 10 }}>
+      <header style={{ background: 'var(--bg-card)', borderBottom: '1px solid var(--border)', borderTop: '3px solid var(--accent)', boxShadow: 'var(--shadow-panel)', position: 'sticky', top: 0, zIndex: 10 }}>
         <div style={{ maxWidth: 860, margin: '0 auto', padding: '0 16px' }}>
           <div style={{ paddingTop: 14, paddingBottom: 2 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: 6 }}>
@@ -197,7 +197,7 @@ export default function App() {
             {[['game', 'Battle'], ['spells', 'Spells'], ['roster', 'Roster']].map(([key, label]) => (
               <button key={key} className="lrl-tab" onClick={() => setTab(key)}
                 aria-current={tab === key ? 'page' : undefined}
-                style={{ fontFamily: 'Cinzel,serif', fontSize: 12, letterSpacing: '0.15em', textTransform: 'uppercase', padding: '10px 20px', background: 'transparent', border: 'none', borderBottom: tab === key ? `2px solid var(--accent)` : '2px solid transparent', color: tab === key ? 'var(--accent)' : 'var(--text-dim)', cursor: 'pointer', marginBottom: -1, fontWeight: tab === key ? 700 : 400, minHeight: 44 }}>
+                style={{ fontFamily: 'Cinzel,serif', fontSize: 12, letterSpacing: '0.15em', textTransform: 'uppercase', padding: '10px 24px', background: 'transparent', border: 'none', borderBottom: tab === key ? `2px solid var(--accent)` : '2px solid transparent', color: tab === key ? 'var(--accent)' : 'var(--text-muted)', cursor: 'pointer', marginBottom: -1, fontWeight: tab === key ? 700 : 500, minHeight: 44, transition: 'color 0.18s, border-color 0.18s' }}>
                 {label}
               </button>
             ))}
@@ -223,7 +223,7 @@ export default function App() {
         {/* BATTLE TAB — no active game */}
         {tab === 'game' && !game && (
           <div>
-            <div style={{ textAlign: 'center', padding: '48px 20px' }}>
+            <div style={{ textAlign: 'center', padding: '48px 32px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, boxShadow: 'var(--shadow-card)', maxWidth: 480, margin: '0 auto' }}>
               <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginBottom: 28, opacity: 0.18 }}>
                 {RUNE_ORDER.map(id => <RuneSymbol key={id} runeId={id} size={50} active />)}
               </div>
@@ -251,7 +251,7 @@ export default function App() {
                 <div style={{ fontFamily: 'Cinzel,serif', fontSize: 10, letterSpacing: '0.28em', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 12 }}>Saved Battles</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   {saves.map(sv => (
-                    <div key={sv.id} style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--bg-card)', border: '1px solid var(--border)', padding: '12px 16px', borderRadius: 6 }}>
+                    <div key={sv.id} style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--bg-card)', border: '1px solid var(--border)', padding: '12px 16px', borderRadius: 10 }}>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: 14, color: 'var(--text-primary)', fontFamily: 'Cinzel,serif', fontWeight: 600 }}>{sv.name}</div>
                         <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
