@@ -11,10 +11,10 @@ export default function AddRuneModal({
 }) {
   if (addStep === 1) return (
     <ModalShell title="Depict Rune" onClose={onClose}>
-      <div style={{ fontSize: 14, color: '#5a4e3a', marginBottom: 4 }}>
+      <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 4 }}>
         Choose a rune. Its effect lasts until end of Round {game.round}.
       </div>
-      <div style={{ fontSize: 12, color: '#a89878', marginBottom: 16 }}>
+      <div style={{ fontSize: 12, color: 'var(--text-dim)', marginBottom: 16 }}>
         Rune stays on scripture permanently to enable enhanced effects.
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -30,14 +30,14 @@ export default function AddRuneModal({
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                   <span style={{ fontFamily: 'Cinzel,serif', fontSize: 15, fontWeight: 700, color: rune.color }}>{rune.name}</span>
-                  <span style={{ fontSize: 12, color: '#8a7d65' }}>{rune.subtitle}</span>
-                  {usedThisRound && <span style={{ fontSize: 10, color: rune.color, background: '#fff', border: `1px solid ${rune.border}`, padding: '2px 8px', fontFamily: 'Cinzel,serif', fontWeight: 600, borderRadius: 10 }}>Already this round</span>}
-                  {!usedThisRound && count > 0 && <span style={{ fontSize: 10, color: '#8a7d65', background: '#f0ece0', border: '1px solid #e0d8c4', padding: '2px 8px', borderRadius: 10 }}>On scripture ×{count}</span>}
+                  <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{rune.subtitle}</span>
+                  {usedThisRound && <span style={{ fontSize: 10, color: rune.color, background: 'var(--bg-card)', border: `1px solid ${rune.border}`, padding: '2px 8px', fontFamily: 'Cinzel,serif', fontWeight: 600, borderRadius: 10 }}>Already this round</span>}
+                  {!usedThisRound && count > 0 && <span style={{ fontSize: 10, color: 'var(--text-muted)', background: 'var(--bg-subtle)', border: '1px solid var(--border-medium)', padding: '2px 8px', borderRadius: 10 }}>On scripture ×{count}</span>}
                 </div>
-                <div style={{ fontSize: 13, color: '#5a4e3a', marginTop: 3 }}>{rune.short}</div>
+                <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 3 }}>{rune.short}</div>
                 {rune.armyWide && <div style={{ fontSize: 12, color: rune.color, marginTop: 2, fontStyle: 'italic' }}>★ Army-wide this round</div>}
               </div>
-              <span style={{ color: '#a89878', fontSize: 20 }}>›</span>
+              <span style={{ color: 'var(--text-dim)', fontSize: 20 }}>›</span>
             </button>
           );
         })}
@@ -55,28 +55,28 @@ export default function AddRuneModal({
         <RuneSymbol runeId={pendingRune} size={48} />
         <div>
           <div style={{ fontFamily: 'Cinzel,serif', fontSize: 15, fontWeight: 700, color: rune.color, marginBottom: 4 }}>{rune.name} — {rune.subtitle}</div>
-          <div style={{ fontSize: 14, color: '#2e2820', lineHeight: 1.55 }}>{rune.effect}</div>
-          <div style={{ fontSize: 12, color: '#8a7d65', marginTop: 5, fontStyle: 'italic' }}>Effect lasts Round {game.round} only. Rune stays on scripture.</div>
+          <div style={{ fontSize: 14, color: 'var(--text-body)', lineHeight: 1.55 }}>{rune.effect}</div>
+          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 5, fontStyle: 'italic' }}>Effect lasts Round {game.round} only. Rune stays on scripture.</div>
           {rune.armyWide && <div style={{ fontSize: 12, color: rune.color, marginTop: 4, fontStyle: 'italic' }}>★ Army-wide this round.</div>}
         </div>
       </div>
 
       {/* Enhanced effects */}
       {rune.enhanced && (
-        <div style={{ marginBottom: 16, padding: '12px 14px', background: '#f5f1e8', border: '1px solid #e0d8c4', borderRadius: 6 }}>
-          <div style={{ fontSize: 10, color: '#8a7d65', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 10, fontFamily: 'Cinzel,serif' }}>Enhanced Effects</div>
+        <div style={{ marginBottom: 16, padding: '12px 14px', background: 'var(--bg-subtle)', border: '1px solid var(--border-medium)', borderRadius: 6 }}>
+          <div style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 10, fontFamily: 'Cinzel,serif' }}>Enhanced Effects</div>
           {Object.entries(rune.enhanced).map(([condId, data]) => {
             const active = allScriptureIds.has(condId);
             return (
               <div key={condId} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                 <RuneSymbol runeId={condId} size={18} active={active} />
                 <div style={{ flex: 1 }}>
-                  <span style={{ fontFamily: 'Cinzel,serif', fontSize: 12, fontWeight: 700, color: active ? RUNES[condId].color : '#c4b98a' }}>{RUNES[condId].name}: </span>
-                  <span style={{ fontSize: 12, color: active ? RUNES[condId].color : '#c4b98a', fontStyle: 'italic' }}>{data.short}</span>
+                  <span style={{ fontFamily: 'Cinzel,serif', fontSize: 12, fontWeight: 700, color: active ? RUNES[condId].color : 'var(--accent-dim)' }}>{RUNES[condId].name}: </span>
+                  <span style={{ fontSize: 12, color: active ? RUNES[condId].color : 'var(--accent-dim)', fontStyle: 'italic' }}>{data.short}</span>
                 </div>
                 {active
                   ? <span style={{ fontSize: 10, background: RUNES[condId].color, color: '#fff', padding: '2px 8px', borderRadius: 10, fontFamily: 'Cinzel,serif', fontWeight: 600, whiteSpace: 'nowrap' }}>✦ Will apply</span>
-                  : <span style={{ fontSize: 10, color: '#c4b98a', whiteSpace: 'nowrap' }}>Not on scripture</span>
+                  : <span style={{ fontSize: 10, color: 'var(--accent-dim)', whiteSpace: 'nowrap' }}>Not on scripture</span>
                 }
               </div>
             );
@@ -85,12 +85,12 @@ export default function AddRuneModal({
       )}
 
       {/* Unit assignment */}
-      <div style={{ fontSize: 14, color: '#5a4e3a', marginBottom: 4 }}>
+      <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 4 }}>
         Assign up to 2 units:{' '}
-        <span style={{ fontSize: 13, color: '#8a7d65' }}>{pendingUnits.filter(id => id !== game.acolyteHeroId).length}/2 selected</span>
+        <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{pendingUnits.filter(id => id !== game.acolyteHeroId).length}/2 selected</span>
       </div>
       {acolyteUnit && (
-        <div style={{ fontSize: 12, color: '#7a520a', marginBottom: 10 }}>
+        <div style={{ fontSize: 12, color: 'var(--accent)', marginBottom: 10 }}>
           ✦ {acolyteUnit.name} is available as a bonus Acolyte target (3rd slot).
         </div>
       )}
@@ -103,21 +103,21 @@ export default function AddRuneModal({
           const disabled = !sel && !isAcolyte && normalSelected.length >= 2;
           return (
             <label key={unit.id}
-              style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '13px 16px', background: sel ? rune.bg : '#fff', border: `1px solid ${sel ? rune.border : isAcolyte ? 'rgba(122,82,10,0.25)' : '#d4c9a8'}`, opacity: disabled ? 0.38 : 1, cursor: disabled ? 'default' : 'pointer', borderRadius: 6, minHeight: 52 }}>
+              style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '13px 16px', background: sel ? rune.bg : 'var(--bg-card)', border: `1px solid ${sel ? rune.border : isAcolyte ? 'var(--border-accent-strong)' : 'var(--border)'}`, opacity: disabled ? 0.38 : 1, cursor: disabled ? 'default' : 'pointer', borderRadius: 6, minHeight: 52 }}>
               <input type="checkbox" checked={sel} onChange={() => !disabled && togglePendUnit(unit.id)} style={{ accentColor: rune.color, width: 20, height: 20 }} />
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 16, color: sel ? '#1a1614' : '#5a4e3a' }}>{unit.name}</div>
-                {isAcolyte && <div style={{ fontSize: 11, color: '#7a520a', fontFamily: 'Cinzel,serif', marginTop: 1 }}>✦ Acolyte bonus target</div>}
+                <div style={{ fontSize: 16, color: sel ? 'var(--text-primary)' : 'var(--text-secondary)' }}>{unit.name}</div>
+                {isAcolyte && <div style={{ fontSize: 11, color: 'var(--accent)', fontFamily: 'Cinzel,serif', marginTop: 1 }}>✦ Acolyte bonus target</div>}
               </div>
             </label>
           );
         })}
-        {activeUnits.length === 0 && <div style={{ fontSize: 14, color: '#b0a080', fontStyle: 'italic' }}>No units deployed.</div>}
+        {activeUnits.length === 0 && <div style={{ fontSize: 14, color: 'var(--text-placeholder)', fontStyle: 'italic' }}>No units deployed.</div>}
       </div>
 
       <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
         <button className="lrl-btn" onClick={() => setAddStep(1)}
-          style={{ fontFamily: 'Cinzel,serif', fontSize: 12, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '14px 20px', background: '#fff', color: '#5a4e3a', border: '1px solid #d4c9a8', cursor: 'pointer', borderRadius: 6 }}>
+          style={{ fontFamily: 'Cinzel,serif', fontSize: 12, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '14px 20px', background: 'var(--bg-card)', color: 'var(--text-secondary)', border: '1px solid var(--border)', cursor: 'pointer', borderRadius: 6 }}>
           ← Back
         </button>
         <button className="lrl-btn" onClick={confirmRune}

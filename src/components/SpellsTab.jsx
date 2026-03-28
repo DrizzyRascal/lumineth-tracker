@@ -19,26 +19,26 @@ export default function SpellsTab({ selectedLores, setSelectedLores, game, roste
     <div>
       {/* Lore selection */}
       <div style={{ marginBottom: 28 }}>
-        <div style={{ fontFamily: 'Cinzel,serif', fontSize: 10, letterSpacing: '0.28em', color: '#8a7d65', textTransform: 'uppercase', marginBottom: 12 }}>Select Army Lores</div>
+        <div style={{ fontFamily: 'Cinzel,serif', fontSize: 10, letterSpacing: '0.28em', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 12 }}>Select Army Lores</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {SPELL_LORES.map(lore => {
             const sel = selectedLores.includes(lore.id);
             return (
-              <label key={lore.id} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px', background: sel ? lore.bg : '#fff', border: `1px solid ${sel ? lore.border : '#d4c9a8'}`, borderRadius: 6, cursor: 'pointer', transition: 'all 0.15s', minHeight: 56 }}>
+              <label key={lore.id} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px', background: sel ? lore.bg : 'var(--bg-card)', border: `1px solid ${sel ? lore.border : 'var(--border)'}`, borderRadius: 6, cursor: 'pointer', transition: 'all 0.15s', minHeight: 56 }}>
                 <input type="checkbox" checked={sel} onChange={() => toggleLore(lore.id)} style={{ accentColor: lore.color, width: 20, height: 20 }} />
                 <div>
-                  <div style={{ fontFamily: 'Cinzel,serif', fontSize: 15, fontWeight: 600, color: sel ? lore.color : '#1a1614' }}>{lore.name}</div>
-                  {lore.cost && <div style={{ fontSize: 12, color: '#8a7d65', marginTop: 1 }}>{lore.cost} Points</div>}
+                  <div style={{ fontFamily: 'Cinzel,serif', fontSize: 15, fontWeight: 600, color: sel ? lore.color : 'var(--text-primary)' }}>{lore.name}</div>
+                  {lore.cost && <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 1 }}>{lore.cost} Points</div>}
                 </div>
               </label>
             );
           })}
         </div>
-        <div style={{ fontSize: 12, color: '#a89878', marginTop: 10 }}>Tap a spell card to expand its full Declare and Effect text.</div>
+        <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 10 }}>Tap a spell card to expand its full Declare and Effect text.</div>
       </div>
 
       {selectedLores.length === 0 && visibleHeroSpells.length === 0 && (
-        <div style={{ fontSize: 14, color: '#b0a080', fontStyle: 'italic', textAlign: 'center', padding: '32px 0' }}>
+        <div style={{ fontSize: 14, color: 'var(--text-placeholder)', fontStyle: 'italic', textAlign: 'center', padding: '32px 0' }}>
           Select one or more lores above to view their spells.
         </div>
       )}
@@ -59,9 +59,9 @@ export default function SpellsTab({ selectedLores, setSelectedLores, game, roste
       {/* Hero spells */}
       {visibleHeroSpells.length > 0 && (
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, paddingBottom: 10, borderBottom: '2px solid #d4c9a8' }}>
-            <div style={{ fontFamily: 'Cinzel,serif', fontSize: 17, fontWeight: 700, color: '#1a1614' }}>Hero Spells</div>
-            <div style={{ fontSize: 12, color: '#8a7d65', fontStyle: 'italic' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, paddingBottom: 10, borderBottom: '2px solid var(--border)' }}>
+            <div style={{ fontFamily: 'Cinzel,serif', fontSize: 17, fontWeight: 700, color: 'var(--text-primary)' }}>Hero Spells</div>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)', fontStyle: 'italic' }}>
               {game ? `${visibleHeroSpells.length} hero${visibleHeroSpells.length !== 1 ? 'es' : ''} deployed` : 'from your roster'}
             </div>
           </div>
@@ -85,7 +85,7 @@ export default function SpellsTab({ selectedLores, setSelectedLores, game, roste
       )}
 
       {roster.length === 0 && (
-        <div style={{ marginTop: 20, padding: '12px 16px', background: 'rgba(122,82,10,0.05)', border: '1px solid rgba(122,82,10,0.15)', borderRadius: 4, fontSize: 12, color: '#5a4e3a' }}>
+        <div style={{ marginTop: 20, padding: '12px 16px', background: 'var(--bg-accent-faint)', border: '1px solid var(--border-accent-faint)', borderRadius: 4, fontSize: 12, color: 'var(--text-secondary)' }}>
           Add heroes to your Roster to see their individual spells here.
         </div>
       )}
