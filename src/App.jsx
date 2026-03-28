@@ -28,7 +28,6 @@ export default function App() {
   const [roster,        setRoster]        = useState([]);
   const [game,          setGame]          = useState(null);
   const [modal,         setModal]         = useState(null);
-  const [newUnitName,   setNewUnitName]   = useState('');
   const [startSel,      setStartSel]      = useState([]);
   const [addStep,       setAddStep]       = useState(1);
   const [pendingRune,   setPendingRune]   = useState(null);
@@ -60,7 +59,7 @@ export default function App() {
   const toggleTheme = () => setTheme(t => t === 'light' ? 'dark' : 'light');
 
   // ── Roster ────────────────────────────────────────────────────────────────
-  const addUnit    = () => { const n = newUnitName.trim(); if (!n) return; setRoster(r => [...r, { id: uid(), name: n }]); setNewUnitName(''); };
+  const addUnit    = (unit) => setRoster(r => [...r, { id: uid(), name: unit.name, points: unit.points }]);
   const deleteUnit = (id) => setRoster(r => r.filter(u => u.id !== id));
 
   // ── Game ──────────────────────────────────────────────────────────────────
@@ -210,8 +209,7 @@ export default function App() {
 
         {/* ROSTER TAB */}
         {tab === 'roster' && (
-          <RosterTab roster={roster} game={game} newUnitName={newUnitName}
-            setNewUnitName={setNewUnitName} addUnit={addUnit} deleteUnit={deleteUnit} />
+          <RosterTab roster={roster} game={game} addUnit={addUnit} deleteUnit={deleteUnit} />
         )}
 
         {/* SPELLS TAB */}

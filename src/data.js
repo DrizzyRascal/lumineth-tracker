@@ -52,33 +52,40 @@ export const RUNES = {
 
 export const RUNE_ORDER = ['varinor', 'alaithi', 'ydriliqi', 'oreali', 'thalari'];
 
-export const UNIT_KEYWORDS = {
-  'Teclis': ['SCINARI', 'HERO'],
-  'Tyrion': ['HERO'],
-  'Light of Eltharion': ['HERO'],
-  'Ellania and Ellathor': ['HERO'],
-  'Lyrior Uthralle, Voice of Hysh': ['VANARI', 'HERO'],
-  'Lyrior Uthralle, Warden of Ymetrica': ['VANARI', 'HERO'],
-  'Sevireth, Lord of the Seventh Wind': ['HURAKAN', 'HERO'],
-  'Avalenor, the Stoneheart King': ['ALARITH', 'HERO'],
-  'Vanari Lord Regent': ['VANARI', 'HERO'],
-  'Scinari Cathallar': ['SCINARI', 'HERO'],
-  'Scinari Calligrave': ['SCINARI', 'HERO'],
-  'Scinari Loreseeker': ['SCINARI', 'HERO'],
-  'Scinari Enlightener': ['SCINARI', 'HERO'],
-  'Alarith Stonemage': ['ALARITH', 'HERO'],
-  'Alarith Spirit of the Mountain': ['ALARITH'],
-  'Alarith Stoneguard': ['ALARITH'],
-  'Hurakan Windmage': ['HURAKAN', 'HERO'],
-  'Hurakan Spirit of the Wind': ['HURAKAN'],
-  'Hurakan Windchargers': ['HURAKAN'],
-  'Vanari Starshard Ballistas': ['VANARI'],
-  'Vanari Auralan Wardens': ['VANARI'],
-  'Vanari Auralan Sentinels': ['VANARI'],
-  'Vanari Dawnriders': ['VANARI'],
-  'Vanari Bladelords': ['VANARI'],
-  "Myari's Purifiers": [],
-};
+export const UNIT_DATA = [
+  // ── Heroes ──────────────────────────────────────────────────────────────────
+  { name: 'Alarith Stonemage',                             points: 130, keywords: ['ALARITH', 'HERO'], isHero: true },
+  { name: 'Archmage Teclis and Celennar, Spirit of Hysh', points: 640, keywords: ['SCINARI', 'HERO'], isHero: true },
+  { name: 'Avalenor, the Stoneheart King',                 points: 420, keywords: ['ALARITH', 'HERO'], isHero: true },
+  { name: 'Ellania and Ellathor, Eclipsian Warsages',      points: 290, keywords: ['HERO'],            isHero: true },
+  { name: 'Hurakan Windmage',                              points: 140, keywords: ['HURAKAN', 'HERO'], isHero: true },
+  { name: 'Lyrior Uthralle, Warden of Ymetrica',          points: 250, keywords: ['VANARI', 'HERO'],  isHero: true },
+  { name: 'Scinari Calligrave',                            points: 130, keywords: ['SCINARI', 'HERO'], isHero: true },
+  { name: 'Scinari Cathallar',                             points: 130, keywords: ['SCINARI', 'HERO'], isHero: true },
+  { name: 'Scinari Enlightener',                           points: 180, keywords: ['SCINARI', 'HERO'], isHero: true },
+  { name: 'Scinari Loreseeker',                            points: 140, keywords: ['SCINARI', 'HERO'], isHero: true },
+  { name: 'Sevireth, Lord of the Seventh Wind',            points: 340, keywords: ['HURAKAN', 'HERO'], isHero: true },
+  { name: 'The Light of Eltharion',                        points: 290, keywords: ['HERO'],            isHero: true },
+  { name: 'Vanari Bannerblade',                            points: 140, keywords: ['VANARI', 'HERO'],  isHero: true },
+  { name: 'Vanari Lord Regent',                            points: 110, keywords: ['VANARI', 'HERO'],  isHero: true },
+  { name: 'Vanari Lord Regent on Lightcourser',            points: 150, keywords: ['VANARI', 'HERO'],  isHero: true },
+  // ── Scourge of Ghyran ───────────────────────────────────────────────────────
+  { name: 'The Light of Eltharion (Scourge of Ghyran)',   points: 280, keywords: ['HERO'],            isHero: true, scourgeOfGhyran: true },
+  { name: 'Vanari Bannerblade (Scourge of Ghyran)',        points: 140, keywords: ['VANARI', 'HERO'],  isHero: true, scourgeOfGhyran: true },
+  // ── Units ────────────────────────────────────────────────────────────────────
+  { name: 'Alarith Spirit of the Mountain',                points: 340, keywords: ['ALARITH', 'MONSTER'],          isHero: false },
+  { name: 'Alarith Stoneguard',                            points: 130, keywords: ['AELF', 'ALARITH', 'INFANTRY'], isHero: false },
+  { name: 'Hurakan Spirit of the Wind',                    points: 270, keywords: ['HURAKAN', 'MONSTER'],          isHero: false },
+  { name: 'Hurakan Windchargers',                          points: 160, keywords: ['AELF', 'HURAKAN', 'CAVALRY'],  isHero: false },
+  { name: 'Vanari Auralan Sentinels',                      points: 140, keywords: ['AELF', 'VANARI', 'INFANTRY'],  isHero: false },
+  { name: 'Vanari Auralan Wardens',                        points: 120, keywords: ['AELF', 'VANARI', 'INFANTRY'],  isHero: false },
+  { name: 'Vanari Bladelords',                             points: 150, keywords: ['AELF', 'VANARI', 'INFANTRY'],  isHero: false },
+  { name: 'Vanari Dawnriders',                             points: 180, keywords: ['AELF', 'VANARI', 'CAVALRY'],   isHero: false },
+  { name: 'Vanari Starshard Ballista',                     points: 120, keywords: ['VANARI', 'WAR MACHINE'],       isHero: false },
+  { name: 'Ydrilan Riverblades',                           points: 140, keywords: ['AELF', 'INFANTRY'],            isHero: false },
+];
+
+export const UNIT_KEYWORDS = Object.fromEntries(UNIT_DATA.map(u => [u.name, u.keywords]));
 
 export const WARSCROLL_REMINDERS = {
   'Hurakan Windchargers': (n) => n >= 2
@@ -89,18 +96,6 @@ export const WARSCROLL_REMINDERS = {
     : [{ text: 'Spirit of the Wind: no Oreali on scripture \u2014 no bonus movement', active: false }],
 };
 
-export const LUMINETH_UNITS = [
-  'Teclis', 'Tyrion', 'Light of Eltharion', 'Ellania and Ellathor',
-  'Lyrior Uthralle, Voice of Hysh', 'Lyrior Uthralle, Warden of Ymetrica',
-  'Sevireth, Lord of the Seventh Wind', 'Avalenor, the Stoneheart King',
-  'Vanari Lord Regent', 'Vanari Starshard Ballistas',
-  'Vanari Auralan Wardens', 'Vanari Auralan Sentinels',
-  'Vanari Dawnriders', 'Vanari Bladelords',
-  'Scinari Cathallar', 'Scinari Calligrave', 'Scinari Loreseeker', 'Scinari Enlightener',
-  'Alarith Stonemage', 'Alarith Stoneguard', 'Alarith Spirit of the Mountain',
-  'Hurakan Windmage', 'Hurakan Windchargers', 'Hurakan Spirit of the Wind',
-  "Myari's Purifiers",
-];
 
 export const SPELL_LORES = [
   {

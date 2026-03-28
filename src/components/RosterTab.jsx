@@ -1,43 +1,119 @@
-import { LUMINETH_UNITS } from '../data.js';
+import { useState } from 'react';
+import { UNIT_DATA } from '../data.js';
 import { getKeywords } from '../utils.js';
 
-export default function RosterTab({ roster, game, newUnitName, setNewUnitName, addUnit, deleteUnit }) {
+const POINT_LIMITS = [500, 1000, 1500, 2000, 2500, 3000];
+
+const SECTION_LABEL = {
+  fontFamily: 'Cinzel,serif', fontSize: 10, letterSpacing: '0.28em',
+  textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 10,
+};
+
+function UnitButton({ unit, onClick }) {
+  const isScourge = unit.scourgeOfGhyran;
+  const isHero    = unit.isHero && !isScourge;
+
+  const base = {
+    fontFamily: 'Cinzel,serif', cursor: 'pointer', borderRadius: 8,
+    padding: '8px 12px', border: '1px solid', textAlign: 'left',
+    display: 'flex', flexDirection: 'column', gap: 2, transition: 'filter .15s, box-shadow .15s',
+  };
+
+  const style = isScourge
+    ? { ...base, background: 'rgba(34,139,34,0.12)', borderColor: 'rgba(34,139,34,0.35)', color: '#2d8b3a' }
+    : isHero
+    ? { ...base, background: 'var(--bg-accent-faint)', borderColor: 'var(--border-accent)', color: 'var(--accent)' }
+    : { ...base, background: 'var(--bg-card)', borderColor: 'var(--border)', color: 'var(--text-secondary)' };
+
+  return (
+    <button className="lrl-btn" onClick={onClick} style={style}>
+      <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.05em' }}>{unit.name}</span>
+      <span style={{ fontSize: 11, opacity: 0.75 }}>{unit.points} pts</span>
+    </button>
+  );
+}
+
+export default function RosterTab({ roster, game, addUnit, deleteUnit }) {
+  const [limit, setLimit] = useState(2000);
+
+  const totalPoints = roster.reduce((sum, u) => sum + (u.points || 0), 0);
+  const pct         = Math.min(totalPoints / limit, 1);
+  const overLimit   = totalPoints > limit;
+  const atLimit     = totalPoints === limit;
+  const barColor    = overLimit ? '#b84040' : atLimit ? 'var(--accent)' : 'var(--accent)';
+
+  const heroes  = UNIT_DATA.filter(u => u.isHero && !u.scourgeOfGhyran);
+  const scourge = UNIT_DATA.filter(u => u.scourgeOfGhyran);
+  const units   = UNIT_DATA.filter(u => !u.isHero);
+
   return (
     <div>
-      <div style={{ marginBottom: 28 }}>
-        <div style={{ fontFamily: 'Cinzel,serif', fontSize: 10, letterSpacing: '0.28em', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 10 }}>Add Unit</div>
-        <datalist id="lu">{LUMINETH_UNITS.map(n => <option key={n} value={n} />)}</datalist>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <input list="lu" value={newUnitName} onChange={e => setNewUnitName(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && addUnit()}
-            placeholder="Type or choose a unit…"
-            aria-label="Unit name"
-            style={{ flex: 1, padding: '13px 14px', background: 'var(--bg-input)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 16, fontFamily: "'Crimson Pro',Georgia,serif", outline: 'none', borderRadius: 4 }} />
-          <button className="lrl-btn" onClick={addUnit}
-            style={{ fontFamily: 'Cinzel,serif', fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', padding: '13px 22px', background: 'var(--accent)', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 700, borderRadius: 4 }}>
-            Add
-          </button>
+
+      {/* ── Points tracker ── */}
+      <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: '16px 20px', marginBottom: 28, boxShadow: 'var(--shadow-card)' }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+            <span style={{ fontFamily: 'Cinzel,serif', fontSize: 28, fontWeight: 700, color: overLimit ? '#b84040' : 'var(--text-primary)', lineHeight: 1 }}>
+              {totalPoints}
+            </span>
+            <span style={{ fontFamily: 'Cinzel,serif', fontSize: 13, color: 'var(--text-muted)' }}>/ </span>
+            <select value={limit} onChange={e => setLimit(+e.target.value)}
+              style={{ fontFamily: 'Cinzel,serif', fontSize: 13, fontWeight: 600, color: 'var(--accent)', background: 'transparent', border: 'none', cursor: 'pointer', outline: 'none', padding: '2px 0' }}>
+              {POINT_LIMITS.map(v => <option key={v} value={v}>{v}</option>)}
+            </select>
+            <span style={{ fontFamily: 'Cinzel,serif', fontSize: 13, color: 'var(--text-muted)' }}>pts</span>
+          </div>
+          <span style={{ fontFamily: 'Cinzel,serif', fontSize: 11, letterSpacing: '0.1em', color: overLimit ? '#b84040' : 'var(--text-muted)', textTransform: 'uppercase' }}>
+            {overLimit ? `+${totalPoints - limit} over` : atLimit ? 'Exact' : `${limit - totalPoints} remaining`}
+          </span>
         </div>
-        <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 6 }}>Choose from the dropdown or type a custom name. Keywords are auto-detected for known units.</div>
+        {/* Progress bar */}
+        <div style={{ height: 4, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
+          <div style={{ height: '100%', width: `${pct * 100}%`, background: barColor, borderRadius: 2, transition: 'width 0.3s' }} />
+        </div>
       </div>
 
-      <div style={{ fontFamily: 'Cinzel,serif', fontSize: 10, letterSpacing: '0.28em', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 10 }}>
+      {/* ── Add units ── */}
+      <div style={{ marginBottom: 28 }}>
+        <div style={{ ...SECTION_LABEL, marginBottom: 14 }}>Heroes</div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
+          {heroes.map(u => <UnitButton key={u.name} unit={u} onClick={() => addUnit(u)} />)}
+        </div>
+
+        <div style={{ ...SECTION_LABEL, marginBottom: 8, color: '#2d8b3a' }}>Scourge of Ghyran</div>
+        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 10 }}>Alternate matched play variants</div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
+          {scourge.map(u => <UnitButton key={u.name} unit={u} onClick={() => addUnit(u)} />)}
+        </div>
+
+        <div style={{ ...SECTION_LABEL, marginBottom: 14 }}>Units</div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {units.map(u => <UnitButton key={u.name} unit={u} onClick={() => addUnit(u)} />)}
+        </div>
+      </div>
+
+      {/* ── Roster list ── */}
+      <div style={{ ...SECTION_LABEL }}>
         Roster — {roster.length} unit{roster.length !== 1 ? 's' : ''}
       </div>
 
       {roster.length === 0
-        ? <div style={{ fontSize: 14, color: 'var(--text-placeholder)', fontStyle: 'italic' }}>Your roster is empty.</div>
+        ? <div style={{ fontSize: 14, color: 'var(--text-placeholder)', fontStyle: 'italic' }}>Your roster is empty — add units above.</div>
         : <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {roster.map(unit => {
             const keywords = getKeywords(unit.name);
+            const isScourge = unit.name.includes('Scourge of Ghyran');
             return (
-              <div key={unit.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--bg-card)', border: '1px solid var(--border)', padding: '12px 16px', borderRadius: 4 }}>
-                <div>
-                  <div style={{ fontSize: 15, color: 'var(--text-primary)' }}>{unit.name}</div>
+              <div key={unit.id} style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--bg-card)', border: `1px solid ${isScourge ? 'rgba(34,139,34,0.3)' : 'var(--border)'}`, padding: '10px 16px', borderRadius: 10 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: 14, color: isScourge ? '#2d8b3a' : 'var(--text-primary)', fontFamily: 'Cinzel,serif', fontWeight: 600 }}>{unit.name}</span>
+                    {unit.points && <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'Cinzel,serif' }}>{unit.points} pts</span>}
+                  </div>
                   {keywords.length > 0 && (
-                    <div style={{ display: 'flex', gap: 4, marginTop: 3, flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', gap: 4, marginTop: 4, flexWrap: 'wrap' }}>
                       {keywords.map(k => (
-                        <span key={k} style={{ fontSize: 10, background: 'var(--bg-page)', border: '1px solid var(--border)', padding: '1px 6px', borderRadius: 8, color: 'var(--text-secondary)', fontFamily: 'Cinzel,serif' }}>{k}</span>
+                        <span key={k} style={{ fontSize: 10, background: 'var(--bg-subtle)', border: '1px solid var(--border)', padding: '1px 6px', borderRadius: 8, color: 'var(--text-secondary)', fontFamily: 'Cinzel,serif' }}>{k}</span>
                       ))}
                     </div>
                   )}
@@ -51,8 +127,9 @@ export default function RosterTab({ roster, game, newUnitName, setNewUnitName, a
           })}
         </div>
       }
+
       {game && (
-        <div style={{ marginTop: 24, padding: '12px 16px', background: 'var(--bg-accent-faint)', border: '1px solid var(--border-accent-faint)', fontSize: 13, color: 'var(--text-secondary)', borderRadius: 4 }}>
+        <div style={{ marginTop: 24, padding: '12px 16px', background: 'var(--bg-accent-faint)', border: '1px solid var(--border-accent-faint)', fontSize: 13, color: 'var(--text-secondary)', borderRadius: 10 }}>
           ✦ Battle in progress (Round {game.round}). Roster changes won&apos;t affect the current battle.
         </div>
       )}
