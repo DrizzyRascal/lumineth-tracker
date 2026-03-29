@@ -156,7 +156,35 @@ header {
   .lrl-round-btns {
     width: 100%;
     justify-content: flex-start;
+    flex-wrap: wrap;
   }
+  .lrl-round-btns .lrl-btn:first-child {
+    flex: 1 1 100%;
+  }
+}
+
+/* ── Touch device enhancements ─────────────────────────────────────────── */
+/* Remove/delete buttons: hidden-until-hover doesn't work on touch — always show */
+@media (hover: none) {
+  .lrl-rmv { opacity: 0.45 !important; }
+}
+
+/* Ensure all interactive buttons have comfortable touch targets */
+@media (max-width: 600px) {
+  .lrl-btn { min-height: 44px; }
+
+  /* Round bar: tighter on small screens */
+  .lrl-round-btns { gap: 6px !important; }
+
+  /* Roster add-unit grid: 2 columns so buttons aren't tiny slivers */
+  .lrl-add-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
+    flex-wrap: unset !important;
+  }
+
+  /* Safe area bottom padding for phones with home bars */
+  .lrl-main-content { padding-bottom: max(40px, env(safe-area-inset-bottom, 40px)) !important; }
 }
 
 /* ── Colorblind rune label ─────────────────────────────────────────────── */

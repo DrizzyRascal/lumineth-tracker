@@ -17,8 +17,9 @@ function UnitButton({ unit, onClick }) {
 
   const base = {
     fontFamily: 'Cinzel,serif', cursor: 'pointer', borderRadius: 8,
-    padding: '8px 12px', border: '1px solid', textAlign: 'left',
+    padding: '10px 12px', border: '1px solid', textAlign: 'left',
     display: 'flex', flexDirection: 'column', gap: 2, transition: 'filter .15s, box-shadow .15s',
+    minHeight: 44,
   };
 
   const style = isScourge
@@ -79,30 +80,30 @@ export default function RosterTab({ roster, game, addUnit, deleteUnit, toggleRei
       {/* ── Add units ── */}
       <div style={{ marginBottom: 28 }}>
         <div style={{ ...SECTION_LABEL, marginBottom: 14 }}>Heroes</div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
+        <div className="lrl-add-grid" style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
           {heroes.map(u => <UnitButton key={u.name} unit={u} onClick={() => addUnit(u)} />)}
         </div>
 
         <div style={{ ...SECTION_LABEL, marginBottom: 8, color: '#2d8b3a' }}>Scourge of Ghyran</div>
         <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 10 }}>Alternate matched play variants</div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
+        <div className="lrl-add-grid" style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
           {scourge.map(u => <UnitButton key={u.name} unit={u} onClick={() => addUnit(u)} />)}
         </div>
 
         <div style={{ ...SECTION_LABEL, marginBottom: 14 }}>Units</div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
+        <div className="lrl-add-grid" style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
           {units.map(u => <UnitButton key={u.name} unit={u} onClick={() => addUnit(u)} />)}
         </div>
 
         <div style={{ ...SECTION_LABEL, marginBottom: 8 }}>Faction Terrain</div>
         <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 10 }}>Included at no points cost</div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
+        <div className="lrl-add-grid" style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
           {terrain.map(u => <UnitButton key={u.name} unit={u} onClick={() => addUnit(u)} />)}
         </div>
 
         <div style={{ ...SECTION_LABEL, marginBottom: 8 }}>Manifestations of Hysh</div>
         <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 10 }}>Toggle to include in your army — track deployment on the Hero Phase tab</div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        <div className="lrl-add-grid" style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
           {MANIFESTATIONS.map(m => {
             const selected = selectedManifestations.includes(m.id);
             return (
@@ -133,8 +134,9 @@ export default function RosterTab({ roster, game, addUnit, deleteUnit, toggleRei
             const isHeroUnit  = meta?.isHero ?? false;
             const effectivePts = unit.reinforced ? (unit.points || 0) * 2 : (unit.points || 0);
             return (
-              <div key={unit.id} style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--bg-card)', border: `1px solid ${isScourge ? 'rgba(34,139,34,0.3)' : unit.reinforced ? 'var(--border-accent)' : 'var(--border)'}`, padding: '10px 16px', borderRadius: 10 }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
+              <div key={unit.id} style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', background: 'var(--bg-card)', border: `1px solid ${isScourge ? 'rgba(34,139,34,0.3)' : unit.reinforced ? 'var(--border-accent)' : 'var(--border)'}`, padding: '12px 14px', borderRadius: 10 }}>
+                {/* Unit info — takes remaining width, never truncates name */}
+                <div style={{ flex: '1 1 55%', minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                     <span style={{ fontSize: 14, color: isScourge ? '#2d8b3a' : 'var(--text-primary)', fontFamily: 'Cinzel,serif', fontWeight: 600 }}>{unit.name}</span>
                     {unit.reinforced
@@ -154,23 +156,26 @@ export default function RosterTab({ roster, game, addUnit, deleteUnit, toggleRei
                     </div>
                   )}
                 </div>
-                {canReinforce && (
-                  <button className="lrl-btn" onClick={() => toggleReinforce(unit.id)}
-                    style={{ fontFamily: 'Cinzel,serif', fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '6px 10px', borderRadius: 8, cursor: 'pointer', whiteSpace: 'nowrap', border: '1px solid', background: unit.reinforced ? 'var(--bg-accent-medium)' : 'transparent', color: unit.reinforced ? 'var(--accent)' : 'var(--text-muted)', borderColor: unit.reinforced ? 'var(--border-accent)' : 'var(--border-subtle)' }}>
-                    {unit.reinforced ? '× Undo' : '+ Reinforce'}
-                  </button>
-                )}
-                {isHeroUnit && (
-                  <button className="lrl-btn" onClick={() => toggleAcolyteOfRunes(unit.id)}
-                    title="Acolyte of the Runes — Heroic Trait"
-                    style={{ fontFamily: 'Cinzel,serif', fontSize: 10, letterSpacing: '0.06em', textTransform: 'uppercase', padding: '6px 10px', borderRadius: 8, cursor: 'pointer', whiteSpace: 'nowrap', border: '1px solid', background: unit.acolyteOfRunes ? 'var(--bg-accent-faint)' : 'transparent', color: unit.acolyteOfRunes ? 'var(--accent)' : 'var(--text-dim)', borderColor: unit.acolyteOfRunes ? 'var(--border-accent)' : 'var(--border-subtle)' }}>
-                    {unit.acolyteOfRunes ? '✦ Acolyte' : 'Acolyte'}
-                  </button>
-                )}
-                <button onClick={() => deleteUnit(unit.id)} aria-label={`Remove ${unit.name}`}
-                  style={{ background: 'none', border: 'none', color: 'var(--accent-dim)', cursor: 'pointer', fontSize: 22, padding: '0 6px', lineHeight: 1, minWidth: 44, minHeight: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  onMouseEnter={e => e.currentTarget.style.color = '#b84040'}
-                  onMouseLeave={e => e.currentTarget.style.color = 'var(--accent-dim)'}>×</button>
+                {/* Action buttons — group together so they wrap as a unit */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                  {canReinforce && (
+                    <button className="lrl-btn" onClick={() => toggleReinforce(unit.id)}
+                      style={{ fontFamily: 'Cinzel,serif', fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '8px 11px', borderRadius: 8, cursor: 'pointer', whiteSpace: 'nowrap', border: '1px solid', background: unit.reinforced ? 'var(--bg-accent-medium)' : 'transparent', color: unit.reinforced ? 'var(--accent)' : 'var(--text-muted)', borderColor: unit.reinforced ? 'var(--border-accent)' : 'var(--border-subtle)' }}>
+                      {unit.reinforced ? '× Undo' : '+ Reinforce'}
+                    </button>
+                  )}
+                  {isHeroUnit && (
+                    <button className="lrl-btn" onClick={() => toggleAcolyteOfRunes(unit.id)}
+                      title="Acolyte of the Runes — Heroic Trait"
+                      style={{ fontFamily: 'Cinzel,serif', fontSize: 10, letterSpacing: '0.06em', textTransform: 'uppercase', padding: '8px 11px', borderRadius: 8, cursor: 'pointer', whiteSpace: 'nowrap', border: '1px solid', background: unit.acolyteOfRunes ? 'var(--bg-accent-faint)' : 'transparent', color: unit.acolyteOfRunes ? 'var(--accent)' : 'var(--text-dim)', borderColor: unit.acolyteOfRunes ? 'var(--border-accent)' : 'var(--border-subtle)' }}>
+                      {unit.acolyteOfRunes ? '✦ Acolyte' : 'Acolyte'}
+                    </button>
+                  )}
+                  <button onClick={() => deleteUnit(unit.id)} aria-label={`Remove ${unit.name}`}
+                    style={{ background: 'none', border: 'none', color: 'var(--accent-dim)', cursor: 'pointer', fontSize: 22, lineHeight: 1, minWidth: 44, minHeight: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 8 }}
+                    onMouseEnter={e => e.currentTarget.style.color = '#b84040'}
+                    onMouseLeave={e => e.currentTarget.style.color = 'var(--accent-dim)'}>×</button>
+                </div>
               </div>
             );
           })}

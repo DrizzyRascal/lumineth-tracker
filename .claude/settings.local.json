@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(npm run:*)",
+      "Read(//d C:/Users/james/AppData/Roaming/Claude/local-agent-mode-sessions/skills-plugin/a3aa567c-5ee7-45c4-9da7-a5aadfb76d1f/fe274684-f249-453d-87e8-4f179c4799b6/skills/**)",
+      "Bash(python -c \":*)",
+      "Bash(pip install:*)"
+    ]
+  }
+}

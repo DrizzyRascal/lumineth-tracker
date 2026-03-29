@@ -409,7 +409,7 @@ export default function App() {
       )}
 
       {/* ── MAIN ── */}
-      <main style={{ maxWidth: 860, margin: '0 auto', padding: '20px 16px', paddingBottom: 40 }}>
+      <main className="lrl-main-content" style={{ maxWidth: 860, margin: '0 auto', padding: isMobile ? '14px 12px' : '20px 16px', paddingBottom: 40 }}>
 
         {/* ROSTER TAB */}
         {tab === 'roster' && (
@@ -490,7 +490,7 @@ export default function App() {
             <div className="lrl-round-bar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
               <div>
                 <div style={{ fontFamily: 'Cinzel,serif', fontSize: 10, letterSpacing: '0.3em', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Battle Round</div>
-                <div style={{ fontFamily: 'Cinzel,serif', fontSize: 52, fontWeight: 700, color: 'var(--accent)', lineHeight: 1 }}>{game.round}</div>
+                <div style={{ fontFamily: 'Cinzel,serif', fontSize: isMobile ? 40 : 52, fontWeight: 700, color: 'var(--accent)', lineHeight: 1 }}>{game.round}</div>
               </div>
               <div className="lrl-round-btns" style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 <button className="lrl-btn" onClick={openDepict} style={btnPrimary}>✦ Depict Rune</button>
@@ -522,7 +522,7 @@ export default function App() {
             <div style={{ fontFamily: 'Cinzel,serif', fontSize: 10, letterSpacing: '0.28em', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 12 }}>
               Unit Status — {activeUnits.length} deployed
             </div>
-            <div className="lrl-unit-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 10 }}>
+            <div className="lrl-unit-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(260px, 100%), 1fr))', gap: 10 }}>
               {activeUnits.map(unit => (
                 <UnitCard key={unit.id} unit={unit} game={game} expandedId={expandedId} setExpandedId={setExpandedId} />
               ))}

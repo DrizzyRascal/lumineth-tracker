@@ -26,24 +26,24 @@ function ArcaneChargeTracker({ charges, setCharges }) {
           {charges} / {MAX}
         </span>
       </div>
-      <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
+      <div style={{ display: 'flex', gap: 5, marginBottom: 12 }}>
         {Array.from({ length: MAX }, (_, i) => (
-          <div key={i} style={{ flex: 1, height: 10, borderRadius: 3, background: i < charges ? 'var(--accent)' : 'var(--border)', transition: 'background 0.15s' }} />
+          <div key={i} style={{ flex: 1, height: 14, borderRadius: 4, background: i < charges ? 'var(--accent)' : 'var(--border)', transition: 'background 0.15s', boxShadow: i < charges ? '0 1px 4px rgba(29,111,165,0.3)' : 'none' }} />
         ))}
       </div>
       <div style={{ display: 'flex', gap: 6 }}>
         <button className="lrl-btn" onClick={() => setCharges(c => Math.min(c + 1, MAX))}
-          style={{ flex: 1, fontFamily: 'Cinzel,serif', fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '7px 0', background: 'var(--bg-accent-medium)', color: 'var(--accent)', border: '1px solid var(--border-accent)', cursor: 'pointer', borderRadius: 6 }}>
+          style={{ flex: 1, fontFamily: 'Cinzel,serif', fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '11px 0', background: 'var(--bg-accent-medium)', color: 'var(--accent)', border: '1px solid var(--border-accent)', cursor: 'pointer', borderRadius: 6 }}>
           + Add
         </button>
         <button className="lrl-btn" onClick={() => setCharges(0)}
           disabled={charges === 0}
-          style={{ flex: 1, fontFamily: 'Cinzel,serif', fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '7px 0', background: 'transparent', color: charges === 0 ? 'var(--text-placeholder)' : 'var(--text-muted)', border: '1px solid var(--border-subtle)', cursor: charges === 0 ? 'default' : 'pointer', borderRadius: 6 }}>
+          style={{ flex: 1, fontFamily: 'Cinzel,serif', fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '11px 0', background: 'transparent', color: charges === 0 ? 'var(--text-placeholder)' : 'var(--text-muted)', border: '1px solid var(--border-subtle)', cursor: charges === 0 ? 'default' : 'pointer', borderRadius: 6 }}>
           ✕ Release
         </button>
         <button className="lrl-btn" onClick={() => setCharges(c => Math.max(c - 1, 0))}
           disabled={charges === 0}
-          style={{ fontFamily: 'Cinzel,serif', fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '7px 10px', background: 'transparent', color: charges === 0 ? 'var(--text-placeholder)' : 'var(--text-muted)', border: '1px solid var(--border-subtle)', cursor: charges === 0 ? 'default' : 'pointer', borderRadius: 6 }}>
+          style={{ minWidth: 44, fontFamily: 'Cinzel,serif', fontSize: 16, padding: '11px 12px', background: 'transparent', color: charges === 0 ? 'var(--text-placeholder)' : 'var(--text-muted)', border: '1px solid var(--border-subtle)', cursor: charges === 0 ? 'default' : 'pointer', borderRadius: 6 }}>
           −
         </button>
       </div>
