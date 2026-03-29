@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Navy background pill -->
+  <rect width="32" height="32" rx="7" fill="#0f2744"/>
+  <!-- Outer diamond outline -->
+  <polygon points="16,3 29,16 16,29 3,16"
+    fill="none" stroke="#1d6fa5" stroke-width="2" stroke-linejoin="round"/>
+  <!-- Inner diamond fill -->
+  <polygon points="16,8 24,16 16,24 8,16"
+    fill="#1d6fa5" opacity="0.45"/>
+  <!-- Centre circle — gold accent -->
+  <circle cx="16" cy="16" r="3.2" fill="#c9a227"/>
+</svg>
