@@ -136,6 +136,8 @@ export default function App() {
   const deleteUnit           = (id) => setRoster(r => r.filter(u => u.id !== id));
   const toggleReinforce      = (id) => setRoster(r => r.map(u => u.id === id ? { ...u, reinforced: !u.reinforced } : u));
   const toggleManifestation  = (id) => setSelectedManifestations(s => s.includes(id) ? s.filter(x => x !== id) : [...s, id]);
+  // Exclusive toggle: only one hero can hold the Acolyte of the Runes trait
+  const toggleAcolyteOfRunes = (id) => setRoster(r => r.map(u => ({ ...u, acolyteOfRunes: u.id === id ? !u.acolyteOfRunes : false })));
 
   // ── Game ──────────────────────────────────────────────────────────────────
   const openStartGame = () => { setStartSel(roster.map(u => u.id)); setModal('start'); };
@@ -163,7 +165,19 @@ export default function App() {
   };
 
   // ── Depict Rune ───────────────────────────────────────────────────────────
-  const openDepict  = () => { setAddStep(1); setPendingRune(null); setPendingUnits([]); setModal('add-rune'); };
+  const openDepict = () => {
+    const hasAcolyteHero = activeUnits.some(u => u.acolyteOfRunes);
+    setAddStep(hasAcolyteHero ? 0 : 1);
+    setPendingRune(null);
+    setPendingUnits([]);
+    setModal('add-rune');
+  };
+  // Called from step 0: records the chosen acolyte target and pre-selects them in step 2
+  const setAcolyteTarget = (heroId) => {
+    setGame(g => ({ ...g, acolyteHeroId: heroId }));
+    setPendingUnits(heroId ? [heroId] : []);
+    setAddStep(1);
+  };
   const confirmRune = () => {
     if (!pendingRune) return;
     setGame(g => ({
@@ -314,7 +328,8 @@ export default function App() {
         {/* ROSTER TAB */}
         {tab === 'roster' && (
           <RosterTab roster={roster} game={game} addUnit={addUnit} deleteUnit={deleteUnit} toggleReinforce={toggleReinforce}
-            selectedManifestations={selectedManifestations} toggleManifestation={toggleManifestation} />
+            selectedManifestations={selectedManifestations} toggleManifestation={toggleManifestation}
+            toggleAcolyteOfRunes={toggleAcolyteOfRunes} />
         )}
 
         {/* HERO PHASE TAB */}
@@ -414,8 +429,7 @@ export default function App() {
               uniqueRuneCount={uniqueRuneCount} removeEntry={removeEntry} />
 
             <SpecialAbilitiesPanel game={game} activeUnits={activeUnits} setGame={setGame}
-              openTeclisDiscs={() => setModal('teclis-discs')}
-              openAcolytePick={() => setModal('acolyte-pick')} />
+              openTeclisDiscs={() => setModal('teclis-discs')} />
 
             <RulesBanner />
 
@@ -441,10 +455,8 @@ export default function App() {
           addStep={addStep} setAddStep={setAddStep}
           pendingRune={pendingRune} setPendingRune={setPendingRune}
           pendingUnits={pendingUnits} togglePendUnit={togglePendUnit}
+          setAcolyteTarget={setAcolyteTarget}
           confirmRune={confirmRune} onClose={() => setModal(null)} />
-      )}
-      {modal === 'acolyte-pick' && game && (
-        <AcolytePickModal activeUnits={activeUnits} game={game} setGame={setGame} onClose={() => setModal(null)} />
       )}
       {modal === 'teclis-discs' && game && (
         <TeclisDiscsModal game={game} confirmTeclisDiscs={confirmTeclisDiscs} onClose={() => setModal(null)} />

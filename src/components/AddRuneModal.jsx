@@ -1,14 +1,54 @@
-import { RUNE_ORDER, RUNES } from '../data.js';
+import { RUNE_ORDER, RUNES, UNIT_DATA } from '../data.js';
 import RuneSymbol from './RuneSymbol.jsx';
 import ModalShell from './ModalShell.jsx';
+
+const HERO_NAMES = new Set(UNIT_DATA.filter(u => u.isHero).map(u => u.name));
+const isHeroUnit = (name) => HERO_NAMES.has(name);
 
 export default function AddRuneModal({
   game, activeUnits, allScriptureIds,
   addStep, setAddStep,
   pendingRune, setPendingRune,
   pendingUnits, togglePendUnit,
+  setAcolyteTarget,
   confirmRune, onClose,
 }) {
+  const hasAcolyteHero = activeUnits.some(u => u.acolyteOfRunes);
+
+  // ── Step 0: Pick acolyte hero target ────────────────────────────────────
+  if (addStep === 0) {
+    const heroUnits = activeUnits.filter(u => isHeroUnit(u.name));
+    return (
+      <ModalShell title="Acolyte of the Runes" onClose={onClose}>
+        <div style={{ padding: '12px 14px', background: 'var(--bg-accent-faint)', border: '1px solid var(--border-accent)', borderRadius: 8, marginBottom: 18 }}>
+          <div style={{ fontFamily: 'Cinzel,serif', fontSize: 11, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--accent)', fontWeight: 600, marginBottom: 6 }}>Heroic Trait — Start of Battle Round</div>
+          <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+            Pick a friendly <strong>LUMINETH HERO</strong> within 12&quot;. That hero may be picked as an additional (3rd) target for the next Depict Rune ability.
+          </div>
+        </div>
+
+        <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 12 }}>Select the hero within 12&quot; of your Acolyte:</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
+          {heroUnits.map(unit => (
+            <button key={unit.id} className="lrl-btn" onClick={() => setAcolyteTarget(unit.id)}
+              style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px', background: 'var(--bg-card)', border: '1px solid var(--border-accent)', borderRadius: 8, cursor: 'pointer', textAlign: 'left', width: '100%' }}>
+              <span style={{ fontFamily: 'Cinzel,serif', fontSize: 14, color: 'var(--accent)', flex: 1 }}>{unit.name}</span>
+              <span style={{ color: 'var(--text-dim)', fontSize: 18 }}>›</span>
+            </button>
+          ))}
+          {heroUnits.length === 0 && (
+            <div style={{ fontSize: 13, color: 'var(--text-placeholder)', fontStyle: 'italic' }}>No heroes deployed.</div>
+          )}
+        </div>
+
+        <button className="lrl-btn" onClick={() => setAcolyteTarget(null)}
+          style={{ fontFamily: 'Cinzel,serif', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '12px 18px', background: 'transparent', color: 'var(--text-muted)', border: '1px solid var(--border-subtle)', cursor: 'pointer', borderRadius: 6, width: '100%' }}>
+          Skip — no target this round
+        </button>
+      </ModalShell>
+    );
+  }
+
   if (addStep === 1) return (
     <ModalShell title="Depict Rune" onClose={onClose}>
       <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 4 }}>
@@ -116,7 +156,7 @@ export default function AddRuneModal({
       </div>
 
       <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-        <button className="lrl-btn" onClick={() => setAddStep(1)}
+        <button className="lrl-btn" onClick={() => setAddStep(hasAcolyteHero ? 0 : 1)}
           style={{ fontFamily: 'Cinzel,serif', fontSize: 12, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '14px 20px', background: 'var(--bg-card)', color: 'var(--text-secondary)', border: '1px solid var(--border)', cursor: 'pointer', borderRadius: 6 }}>
           ← Back
         </button>

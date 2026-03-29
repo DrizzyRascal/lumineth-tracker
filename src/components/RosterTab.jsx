@@ -35,7 +35,7 @@ function UnitButton({ unit, onClick }) {
   );
 }
 
-export default function RosterTab({ roster, game, addUnit, deleteUnit, toggleReinforce, selectedManifestations, toggleManifestation }) {
+export default function RosterTab({ roster, game, addUnit, deleteUnit, toggleReinforce, selectedManifestations, toggleManifestation, toggleAcolyteOfRunes }) {
   const [limit, setLimit] = useState(2000);
 
   const totalPoints = roster.reduce((sum, u) => sum + (u.reinforced ? (u.points || 0) * 2 : (u.points || 0)), 0);
@@ -130,6 +130,7 @@ export default function RosterTab({ roster, game, addUnit, deleteUnit, toggleRei
             const meta      = UNIT_META[unit.name];
             const canReinforce = meta?.canReinforce ?? false;
             const isTerrain   = meta?.isTerrain ?? false;
+            const isHeroUnit  = meta?.isHero ?? false;
             const effectivePts = unit.reinforced ? (unit.points || 0) * 2 : (unit.points || 0);
             return (
               <div key={unit.id} style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--bg-card)', border: `1px solid ${isScourge ? 'rgba(34,139,34,0.3)' : unit.reinforced ? 'var(--border-accent)' : 'var(--border)'}`, padding: '10px 16px', borderRadius: 10 }}>
@@ -157,6 +158,13 @@ export default function RosterTab({ roster, game, addUnit, deleteUnit, toggleRei
                   <button className="lrl-btn" onClick={() => toggleReinforce(unit.id)}
                     style={{ fontFamily: 'Cinzel,serif', fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '6px 10px', borderRadius: 8, cursor: 'pointer', whiteSpace: 'nowrap', border: '1px solid', background: unit.reinforced ? 'var(--bg-accent-medium)' : 'transparent', color: unit.reinforced ? 'var(--accent)' : 'var(--text-muted)', borderColor: unit.reinforced ? 'var(--border-accent)' : 'var(--border-subtle)' }}>
                     {unit.reinforced ? '× Undo' : '+ Reinforce'}
+                  </button>
+                )}
+                {isHeroUnit && (
+                  <button className="lrl-btn" onClick={() => toggleAcolyteOfRunes(unit.id)}
+                    title="Acolyte of the Runes — Heroic Trait"
+                    style={{ fontFamily: 'Cinzel,serif', fontSize: 10, letterSpacing: '0.06em', textTransform: 'uppercase', padding: '6px 10px', borderRadius: 8, cursor: 'pointer', whiteSpace: 'nowrap', border: '1px solid', background: unit.acolyteOfRunes ? 'var(--bg-accent-faint)' : 'transparent', color: unit.acolyteOfRunes ? 'var(--accent)' : 'var(--text-dim)', borderColor: unit.acolyteOfRunes ? 'var(--border-accent)' : 'var(--border-subtle)' }}>
+                    {unit.acolyteOfRunes ? '✦ Acolyte' : 'Acolyte'}
                   </button>
                 )}
                 <button onClick={() => deleteUnit(unit.id)} aria-label={`Remove ${unit.name}`}

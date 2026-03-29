@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { isHero } from '../utils.js';
 
 function ToggleBtn({ on, onClick, label, sub }) {
   return (
@@ -16,19 +15,17 @@ function ToggleBtn({ on, onClick, label, sub }) {
   );
 }
 
-export default function SpecialAbilitiesPanel({ game, activeUnits, setGame, openTeclisDiscs, openAcolytePick }) {
+export default function SpecialAbilitiesPanel({ game, activeUnits, setGame, openTeclisDiscs }) {
   const [open, setOpen] = useState(true);
 
   const sevirethDeployed  = activeUnits.some(u => u.name.includes('Sevireth'));
   const lyriorDeployed    = activeUnits.some(u => u.name.includes('Lyrior'));
   const avalenorDeployed  = activeUnits.some(u => u.name.includes('Avalenor'));
   const teclisDeployed    = activeUnits.some(u => u.name.includes('Teclis'));
-  const heroUnits         = activeUnits.filter(u => isHero(u.name));
-  const hasAnything       = sevirethDeployed || lyriorDeployed || avalenorDeployed || teclisDeployed || heroUnits.length > 0;
+  const hasAnything       = sevirethDeployed || lyriorDeployed || avalenorDeployed || teclisDeployed;
 
   if (!hasAnything) return null;
 
-  const acolyteUnit = activeUnits.find(u => u.id === game.acolyteHeroId);
   const toggle = (key) => setGame(g => ({ ...g, [key]: !g[key] }));
 
   return (
@@ -41,23 +38,6 @@ export default function SpecialAbilitiesPanel({ game, activeUnits, setGame, open
 
       {open && (
         <div style={{ padding: '14px 16px' }}>
-          {/* Acolyte */}
-          <div style={{ marginBottom: 14 }}>
-            <div style={{ fontFamily: 'Cinzel,serif', fontSize: 11, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 8, fontWeight: 600 }}>Acolyte of the Runes — Heroic Trait</div>
-            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8, lineHeight: 1.5 }}>At Start of Battle Round, pick a friendly LUMINETH HERO within 12&quot;. That hero may be picked as an additional (3rd) target for the next Depict Rune ability.</div>
-            {acolyteUnit
-              ? <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: 'var(--bg-accent-soft)', border: '1px solid var(--border-accent-strong)', borderRadius: 6 }}>
-                <span style={{ fontSize: 14, flex: 1, color: 'var(--text-primary)' }}>✦ <strong>{acolyteUnit.name}</strong> — bonus target for next Depict Rune</span>
-                <button className="lrl-btn" onClick={() => setGame(g => ({ ...g, acolyteHeroId: null }))}
-                  style={{ fontFamily: 'Cinzel,serif', fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '6px 12px', background: 'transparent', color: 'var(--text-dim)', border: '1px solid var(--border)', cursor: 'pointer', borderRadius: 4, whiteSpace: 'nowrap' }}>Clear</button>
-              </div>
-              : <button className="lrl-btn" onClick={openAcolytePick}
-                style={{ fontFamily: 'Cinzel,serif', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', padding: '11px 18px', background: 'var(--bg-subtle)', color: 'var(--text-secondary)', border: '1px solid var(--border)', cursor: 'pointer', borderRadius: 6, width: '100%' }}>
-                Set Acolyte Hero Target…
-              </button>
-            }
-          </div>
-
           {/* Passive auras */}
           {(sevirethDeployed || lyriorDeployed || avalenorDeployed) && (
             <>
