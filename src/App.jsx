@@ -14,13 +14,12 @@ import RulesBanner from './components/RulesBanner.jsx';
 import UnitCard from './components/UnitCard.jsx';
 import StartModal from './components/StartModal.jsx';
 import AddRuneModal from './components/AddRuneModal.jsx';
-import AcolytePickModal from './components/AcolytePickModal.jsx';
 import TeclisDiscsModal from './components/TeclisDiscsModal.jsx';
 import RoundChecklistModal from './components/RoundChecklistModal.jsx';
 import BattleSummaryModal from './components/BattleSummaryModal.jsx';
 import HeroPhaseTab from './components/HeroPhaseTab.jsx';
 
-const VERSION = 'v1.1 · 28 Mar 2026';
+const VERSION = 'v1.2 · 29 Mar 2026';
 
 // ── Button style helpers ──────────────────────────────────────────────────────
 const btnPrimary   = { fontFamily: 'Cinzel,serif', fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', padding: '13px 26px', background: 'linear-gradient(135deg, var(--accent-bright), var(--accent))', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 700, borderRadius: 10, boxShadow: '0 2px 10px rgba(0,0,0,0.22)' };
@@ -41,7 +40,6 @@ export default function App() {
   const [selectedManifestations, setSelectedManifestations] = useState([]);
   const [loaded,                 setLoaded]                 = useState(false);
   const [theme,         setTheme]         = useState('light');
-  const [saves,         setSaves]         = useState([]);
   const [user,          setUser]          = useState(null);
   const [cloudSyncing,  setCloudSyncing]  = useState(false);
   const [menuOpen,      setMenuOpen]      = useState(false);
@@ -56,7 +54,6 @@ export default function App() {
     const l = store.get('lrl_lores');  if (l) try { setSelectedLores(JSON.parse(l.value)); } catch {}
     const m = store.get('lrl_manif'); if (m) try { setSelectedManifestations(JSON.parse(m.value)); } catch {}
     const t = store.get('lrl_theme');  if (t) setTheme(t.value === 'dark' ? 'dark' : 'light');
-    const s = store.get('lrl_saves');  if (s) try { setSaves(JSON.parse(s.value)); } catch {}
     setLoaded(true);
   }, []);
 
@@ -65,7 +62,6 @@ export default function App() {
   useEffect(() => { if (!loaded) return; store.set('lrl_lores', JSON.stringify(selectedLores)); }, [selectedLores, loaded]);
   useEffect(() => { if (!loaded) return; store.set('lrl_manif', JSON.stringify(selectedManifestations)); }, [selectedManifestations, loaded]);
   useEffect(() => { if (!loaded) return; store.set('lrl_theme', theme); }, [theme, loaded]);
-  useEffect(() => { if (!loaded) return; store.set('lrl_saves', JSON.stringify(saves)); }, [saves, loaded]);
 
   // ── Responsive breakpoint ─────────────────────────────────────────────────
   useEffect(() => {
@@ -95,7 +91,6 @@ export default function App() {
             if (d.game !== undefined)     setGame(d.game);
             if (d.selectedLores)          setSelectedLores(d.selectedLores);
             if (d.selectedManifestations) setSelectedManifestations(d.selectedManifestations);
-            if (d.saves)                  setSaves(d.saves);
             if (d.theme)                  setTheme(d.theme === 'dark' ? 'dark' : 'light');
           }
           // Short delay so state setters above settle before sync starts writing
@@ -120,7 +115,7 @@ export default function App() {
       try {
         setCloudSyncing(true);
         await setDoc(doc(db, 'users', user.uid), {
-          roster, game, selectedLores, selectedManifestations, saves, theme,
+          roster, game, selectedLores, selectedManifestations, theme,
           updatedAt: serverTimestamp(),
         });
       } catch (e) {
@@ -130,7 +125,7 @@ export default function App() {
       }
     }, 1500);
     return () => clearTimeout(saveTimer.current);
-  }, [roster, game, selectedLores, selectedManifestations, saves, theme, user, loaded]);
+  }, [roster, game, selectedLores, selectedManifestations, theme, user, loaded]);
 
   // ── Sign in / out ─────────────────────────────────────────────────────────
   const signIn = async () => {
@@ -219,20 +214,6 @@ export default function App() {
     if (!isAcolyte && normalSelected.length >= 2) return s;
     return [...s, id];
   });
-
-  // ── Battle Saves ──────────────────────────────────────────────────────────
-  const saveCurrentBattle = () => {
-    if (!game) return;
-    const name = `Round ${game.round} — ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`;
-    const entry = { id: uid(), name, savedAt: new Date().toISOString(), roster, game, selectedLores };
-    setSaves(s => [entry, ...s]);
-  };
-  const loadSave = (save) => {
-    if (save.roster) setRoster(save.roster);
-    if (save.game !== undefined) setGame(save.game);
-    if (save.selectedLores) setSelectedLores(save.selectedLores);
-  };
-  const deleteSave = (id) => setSaves(s => s.filter(sv => sv.id !== id));
 
   // ── Derived ───────────────────────────────────────────────────────────────
   const activeUnits     = game ? roster.filter(u => game.activeUnitIds.includes(u.id)) : [];
@@ -454,32 +435,6 @@ export default function App() {
               }
             </div>
 
-            {/* Saved battles */}
-            {saves.length > 0 && (
-              <div style={{ marginTop: 8 }}>
-                <div style={{ fontFamily: 'Cinzel,serif', fontSize: 10, letterSpacing: '0.28em', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 12 }}>Saved Battles</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  {saves.map(sv => (
-                    <div key={sv.id} style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--bg-card)', border: '1px solid var(--border)', padding: '12px 16px', borderRadius: 10 }}>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 14, color: 'var(--text-primary)', fontFamily: 'Cinzel,serif', fontWeight: 600 }}>{sv.name}</div>
-                        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
-                          {sv.roster?.length ?? 0} units · saved {new Date(sv.savedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                        </div>
-                      </div>
-                      <button className="lrl-btn" onClick={() => loadSave(sv)}
-                        style={{ fontFamily: 'Cinzel,serif', fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '7px 14px', background: 'var(--bg-accent-faint)', color: 'var(--accent)', border: '1px solid var(--border-accent-faint)', cursor: 'pointer', borderRadius: 4, whiteSpace: 'nowrap' }}>
-                        Load
-                      </button>
-                      <button onClick={() => deleteSave(sv.id)} aria-label={`Delete save: ${sv.name}`}
-                        style={{ background: 'none', border: 'none', color: 'var(--accent-dim)', cursor: 'pointer', fontSize: 20, lineHeight: 1, padding: '0 4px', minWidth: 36, minHeight: 36, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                        onMouseEnter={e => e.currentTarget.style.color = '#b84040'}
-                        onMouseLeave={e => e.currentTarget.style.color = 'var(--accent-dim)'}>×</button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         )}
 
