@@ -44,6 +44,8 @@ export default function App() {
   const [saves,         setSaves]         = useState([]);
   const [user,          setUser]          = useState(null);
   const [cloudSyncing,  setCloudSyncing]  = useState(false);
+  const [menuOpen,      setMenuOpen]      = useState(false);
+  const [isMobile,      setIsMobile]      = useState(() => window.innerWidth < 740);
   const syncEnabled = useRef(false);
   const saveTimer   = useRef(null);
 
@@ -64,6 +66,20 @@ export default function App() {
   useEffect(() => { if (!loaded) return; store.set('lrl_manif', JSON.stringify(selectedManifestations)); }, [selectedManifestations, loaded]);
   useEffect(() => { if (!loaded) return; store.set('lrl_theme', theme); }, [theme, loaded]);
   useEffect(() => { if (!loaded) return; store.set('lrl_saves', JSON.stringify(saves)); }, [saves, loaded]);
+
+  // ── Responsive breakpoint ─────────────────────────────────────────────────
+  useEffect(() => {
+    const handler = () => {
+      const mobile = window.innerWidth < 740;
+      setIsMobile(mobile);
+      if (!mobile) setMenuOpen(false);
+    };
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, []);
+
+  // ── Tab navigation (closes burger menu) ───────────────────────────────────
+  const goToTab = (key) => { setTab(key); setMenuOpen(false); };
 
   // ── Firebase auth: listen for sign-in / sign-out ──────────────────────────
   useEffect(() => {
@@ -229,11 +245,11 @@ export default function App() {
       style={{ fontFamily: "'Crimson Pro', Georgia, serif", background: 'var(--bg-page)', minHeight: '100vh', color: 'var(--text-primary)' }}>
 
       {/* ── HEADER ── */}
-      <header style={{ background: 'var(--bg-card)', borderBottom: '1px solid var(--border)', borderTop: '3px solid var(--accent)', boxShadow: 'var(--shadow-panel)', position: 'sticky', top: 0, zIndex: 10 }}>
-        <div style={{ maxWidth: 960, margin: '0 auto', padding: '0 16px', display: 'flex', alignItems: 'center', gap: 4, height: 56 }}>
+      <header style={{ background: 'var(--bg-card)', borderBottom: '1px solid var(--border)', borderTop: '3px solid var(--accent)', boxShadow: 'var(--shadow-panel)', position: 'sticky', top: 0, zIndex: 20 }}>
+        <div style={{ maxWidth: 960, margin: '0 auto', padding: '0 16px', display: 'flex', alignItems: 'center', gap: 6, height: 56 }}>
 
           {/* ── Brand (left) ── */}
-          <div style={{ flex: '0 0 auto', marginRight: 8 }}>
+          <div style={{ flex: '0 0 auto', marginRight: 6 }}>
             <div style={{ fontFamily: 'Cinzel,serif', fontSize: 8, letterSpacing: '0.22em', color: 'var(--text-muted)', textTransform: 'uppercase', lineHeight: 1, marginBottom: 3 }}>Warhammer Age of Sigmar</div>
             <div style={{ fontFamily: 'Cinzel,serif', fontSize: 15, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.1em', textTransform: 'uppercase', lineHeight: 1 }}>AOS Lumineth Tracker</div>
           </div>
@@ -241,53 +257,138 @@ export default function App() {
           {/* ── Spacer ── */}
           <div style={{ flex: 1 }} />
 
-          {/* ── Tab nav (centre-right) ── */}
-          <nav style={{ display: 'flex', alignItems: 'stretch', height: '100%', marginRight: 8 }}>
-            {[['game', 'Battle'], ['hero-phase', 'Hero Phase'], ['spells', 'Spells'], ['roster', 'Roster']].map(([key, label]) => (
-              <button key={key} className="lrl-tab" onClick={() => setTab(key)}
-                aria-current={tab === key ? 'page' : undefined}
-                style={{ fontFamily: 'Cinzel,serif', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', padding: '0 18px', background: 'transparent', border: 'none', borderBottom: tab === key ? '3px solid var(--accent)' : '3px solid transparent', borderTop: '3px solid transparent', color: tab === key ? 'var(--accent)' : 'var(--text-muted)', cursor: 'pointer', fontWeight: tab === key ? 700 : 500, transition: 'color 0.18s, border-color 0.18s', whiteSpace: 'nowrap' }}>
-                {label}
+          {/* ── Desktop: tab nav + theme + auth ── */}
+          {!isMobile && (
+            <>
+              <nav style={{ display: 'flex', alignItems: 'stretch', height: '100%', marginRight: 4 }}>
+                {[['game', 'Battle'], ['hero-phase', 'Hero Phase'], ['spells', 'Spells'], ['roster', 'Roster']].map(([key, label]) => (
+                  <button key={key} className="lrl-tab" onClick={() => goToTab(key)}
+                    aria-current={tab === key ? 'page' : undefined}
+                    style={{ fontFamily: 'Cinzel,serif', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', padding: '0 16px', background: 'transparent', border: 'none', borderBottom: tab === key ? '3px solid var(--accent)' : '3px solid transparent', borderTop: '3px solid transparent', color: tab === key ? 'var(--accent)' : 'var(--text-muted)', cursor: 'pointer', fontWeight: tab === key ? 700 : 500, transition: 'color 0.18s, border-color 0.18s', whiteSpace: 'nowrap' }}>
+                    {label}
+                  </button>
+                ))}
+              </nav>
+
+              {/* Theme toggle button */}
+              <button className="lrl-btn" onClick={toggleTheme} aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 38, height: 38, borderRadius: 7, border: 'none', cursor: 'pointer', fontSize: 18, lineHeight: 1, marginRight: 4, flexShrink: 0,
+                  background: theme === 'dark' ? '#ffffff' : '#f0b429',
+                  color:      theme === 'dark' ? '#f0b429'  : '#ffffff',
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.14)' }}>
+                {theme === 'dark' ? '☀' : '☽'}
               </button>
-            ))}
-          </nav>
 
-          {/* ── Theme toggle ── */}
-          <button onClick={toggleTheme} aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-dim)', fontSize: 16, padding: '6px 8px', lineHeight: 1, marginRight: 4 }}>
-            {theme === 'light' ? '◐' : '☀'}
-          </button>
-
-          {/* ── Auth ── */}
-          {user ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              {cloudSyncing
-                ? <span style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'Cinzel,serif', whiteSpace: 'nowrap' }}>↑ Saving…</span>
-                : <span style={{ fontSize: 10, color: '#2d8b3a', fontFamily: 'Cinzel,serif', whiteSpace: 'nowrap' }}>☁ Saved</span>}
-              {user.photoURL && (
-                <img src={user.photoURL} alt={user.displayName ?? 'User'} referrerPolicy="no-referrer"
-                  style={{ width: 28, height: 28, borderRadius: '50%', border: '2px solid var(--border-accent)' }} />
+              {/* Auth */}
+              {user ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  {cloudSyncing
+                    ? <span style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'Cinzel,serif', whiteSpace: 'nowrap' }}>↑ Saving…</span>
+                    : <span style={{ fontSize: 10, color: '#2d8b3a', fontFamily: 'Cinzel,serif', whiteSpace: 'nowrap' }}>☁ Saved</span>}
+                  {user.photoURL && (
+                    <img src={user.photoURL} alt={user.displayName ?? 'User'} referrerPolicy="no-referrer"
+                      style={{ width: 28, height: 28, borderRadius: '50%', border: '2px solid var(--border-accent)' }} />
+                  )}
+                  <button className="lrl-btn" onClick={signOutUser}
+                    style={{ fontFamily: 'Cinzel,serif', fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '8px 14px', background: 'transparent', color: 'var(--text-muted)', border: '1px solid var(--border)', cursor: 'pointer', borderRadius: 7, whiteSpace: 'nowrap' }}>
+                    Sign out
+                  </button>
+                </div>
+              ) : (
+                <button className="lrl-btn" onClick={signIn}
+                  style={{ display: 'flex', alignItems: 'center', gap: 7, fontFamily: 'Cinzel,serif', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '9px 18px', background: 'var(--accent)', color: '#fff', border: 'none', cursor: 'pointer', borderRadius: 7, fontWeight: 700, whiteSpace: 'nowrap', boxShadow: '0 2px 8px rgba(0,0,0,0.18)' }}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true" style={{ flexShrink: 0 }}>
+                    <path fill="#fff" fillOpacity="0.9" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#fff" fillOpacity="0.75" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#fff" fillOpacity="0.6" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+                    <path fill="#fff" fillOpacity="0.85" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                  </svg>
+                  Sign in
+                </button>
               )}
-              <button className="lrl-btn" onClick={signOutUser}
-                style={{ fontFamily: 'Cinzel,serif', fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '7px 12px', background: 'transparent', color: 'var(--text-muted)', border: '1px solid var(--border)', cursor: 'pointer', borderRadius: 6, whiteSpace: 'nowrap' }}>
-                Sign out
+            </>
+          )}
+
+          {/* ── Mobile: theme + burger ── */}
+          {isMobile && (
+            <>
+              {/* Theme toggle */}
+              <button className="lrl-btn" onClick={toggleTheme} aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 36, height: 36, borderRadius: 7, border: 'none', cursor: 'pointer', fontSize: 17, lineHeight: 1, flexShrink: 0,
+                  background: theme === 'dark' ? '#ffffff' : '#f0b429',
+                  color:      theme === 'dark' ? '#f0b429'  : '#ffffff',
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.14)' }}>
+                {theme === 'dark' ? '☀' : '☽'}
               </button>
-            </div>
-          ) : (
-            <button className="lrl-btn" onClick={signIn}
-              style={{ display: 'flex', alignItems: 'center', gap: 7, fontFamily: 'Cinzel,serif', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '9px 18px', background: 'var(--accent)', color: '#fff', border: 'none', cursor: 'pointer', borderRadius: 7, fontWeight: 700, whiteSpace: 'nowrap', boxShadow: '0 2px 8px rgba(0,0,0,0.18)' }}>
-              <svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true" style={{ flexShrink: 0 }}>
-                <path fill="#fff" fillOpacity="0.9" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                <path fill="#fff" fillOpacity="0.75" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                <path fill="#fff" fillOpacity="0.6" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
-                <path fill="#fff" fillOpacity="0.85" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-              </svg>
-              Sign in
-            </button>
+
+              {/* Sync indicator when signed in */}
+              {user && (
+                cloudSyncing
+                  ? <span style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'Cinzel,serif' }}>↑</span>
+                  : <span style={{ fontSize: 13, color: '#2d8b3a' }}>☁</span>
+              )}
+
+              {/* Burger */}
+              <button className="lrl-btn" onClick={() => setMenuOpen(o => !o)} aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+                aria-expanded={menuOpen}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 38, height: 38, borderRadius: 7, background: menuOpen ? 'var(--bg-accent-medium)' : 'transparent', border: menuOpen ? '1px solid var(--border-accent)' : '1px solid var(--border-subtle)', cursor: 'pointer', fontSize: 20, color: 'var(--text-secondary)', flexShrink: 0 }}>
+                {menuOpen ? '✕' : '☰'}
+              </button>
+            </>
           )}
         </div>
+
+        {/* ── Mobile menu dropdown ── */}
+        {isMobile && menuOpen && (
+          <div style={{ borderTop: '1px solid var(--border)', background: 'var(--bg-card)', boxShadow: '0 8px 24px rgba(0,0,0,0.18)' }}>
+            {/* Nav items */}
+            {[['game', 'Battle'], ['hero-phase', 'Hero Phase'], ['spells', 'Spells'], ['roster', 'Roster']].map(([key, label]) => (
+              <button key={key} onClick={() => goToTab(key)}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', textAlign: 'left', fontFamily: 'Cinzel,serif', fontSize: 15, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '18px 20px', background: tab === key ? 'var(--bg-accent-faint)' : 'transparent', border: 'none', borderBottom: '1px solid var(--border-subtle)', color: tab === key ? 'var(--accent)' : 'var(--text-primary)', cursor: 'pointer', fontWeight: tab === key ? 700 : 400 }}>
+                {label}
+                {tab === key && <span style={{ color: 'var(--accent)', fontSize: 12 }}>●</span>}
+              </button>
+            ))}
+
+            {/* Auth row */}
+            <div style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
+              {user ? (
+                <>
+                  {user.photoURL && (
+                    <img src={user.photoURL} alt={user.displayName ?? 'User'} referrerPolicy="no-referrer"
+                      style={{ width: 32, height: 32, borderRadius: '50%', border: '2px solid var(--border-accent)' }} />
+                  )}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontFamily: 'Cinzel,serif', fontSize: 12, color: 'var(--text-primary)', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.displayName}</div>
+                    <div style={{ fontSize: 11, color: cloudSyncing ? 'var(--text-muted)' : '#2d8b3a', marginTop: 2 }}>{cloudSyncing ? '↑ Saving…' : '☁ Synced'}</div>
+                  </div>
+                  <button className="lrl-btn" onClick={() => { signOutUser(); setMenuOpen(false); }}
+                    style={{ fontFamily: 'Cinzel,serif', fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '8px 14px', background: 'transparent', color: 'var(--text-muted)', border: '1px solid var(--border)', cursor: 'pointer', borderRadius: 7 }}>
+                    Sign out
+                  </button>
+                </>
+              ) : (
+                <button className="lrl-btn" onClick={() => { signIn(); setMenuOpen(false); }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'Cinzel,serif', fontSize: 12, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '12px 20px', background: 'var(--accent)', color: '#fff', border: 'none', cursor: 'pointer', borderRadius: 7, fontWeight: 700, width: '100%', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.18)' }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="#fff" fillOpacity="0.9" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#fff" fillOpacity="0.75" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#fff" fillOpacity="0.6" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+                    <path fill="#fff" fillOpacity="0.85" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                  </svg>
+                  Sign in with Google
+                </button>
+              )}
+            </div>
+          </div>
+        )}
       </header>
+
+      {/* ── Mobile menu backdrop (closes on tap outside) ── */}
+      {isMobile && menuOpen && (
+        <div onClick={() => setMenuOpen(false)}
+          style={{ position: 'fixed', inset: 0, zIndex: 19, background: 'rgba(0,0,0,0.25)' }} />
+      )}
 
       {/* ── MAIN ── */}
       <main style={{ maxWidth: 860, margin: '0 auto', padding: '20px 16px', paddingBottom: 40 }}>
