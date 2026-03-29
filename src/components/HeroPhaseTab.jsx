@@ -108,9 +108,10 @@ function ManifestationCard({ manifestation, inBattle, onToggle, arcaneCharges, s
   );
 }
 
-export default function HeroPhaseTab({ game, setGame }) {
+export default function HeroPhaseTab({ game, setGame, selectedManifestations }) {
   const manifestationsInBattle = game?.manifestationsInBattle ?? [];
   const arcaneCharges = game?.arcaneCharges ?? 0;
+  const rosterManifestations = MANIFESTATIONS.filter(m => selectedManifestations.includes(m.id));
 
   const toggleManifestation = (id) => {
     if (!game) return;
@@ -143,9 +144,15 @@ export default function HeroPhaseTab({ game, setGame }) {
           </div>
         )}
 
-        {game && (
+        {game && rosterManifestations.length === 0 && (
+          <div style={{ padding: '16px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, fontSize: 13, color: 'var(--text-placeholder)', fontStyle: 'italic', textAlign: 'center' }}>
+            No manifestations in your roster — toggle them on the Roster tab.
+          </div>
+        )}
+
+        {game && rosterManifestations.length > 0 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {MANIFESTATIONS.map(m => (
+            {rosterManifestations.map(m => (
               <ManifestationCard
                 key={m.id}
                 manifestation={m}

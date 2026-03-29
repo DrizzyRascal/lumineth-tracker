@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { UNIT_DATA } from '../data.js';
+import { UNIT_DATA, MANIFESTATIONS } from '../data.js';
 import { getKeywords } from '../utils.js';
 
 const UNIT_META = Object.fromEntries(UNIT_DATA.map(u => [u.name, u]));
@@ -35,7 +35,7 @@ function UnitButton({ unit, onClick }) {
   );
 }
 
-export default function RosterTab({ roster, game, addUnit, deleteUnit, toggleReinforce }) {
+export default function RosterTab({ roster, game, addUnit, deleteUnit, toggleReinforce, selectedManifestations, toggleManifestation }) {
   const [limit, setLimit] = useState(2000);
 
   const totalPoints = roster.reduce((sum, u) => sum + (u.reinforced ? (u.points || 0) * 2 : (u.points || 0)), 0);
@@ -96,8 +96,23 @@ export default function RosterTab({ roster, game, addUnit, deleteUnit, toggleRei
 
         <div style={{ ...SECTION_LABEL, marginBottom: 8 }}>Faction Terrain</div>
         <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 10 }}>Included at no points cost</div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
           {terrain.map(u => <UnitButton key={u.name} unit={u} onClick={() => addUnit(u)} />)}
+        </div>
+
+        <div style={{ ...SECTION_LABEL, marginBottom: 8 }}>Manifestations of Hysh</div>
+        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 10 }}>Toggle to include in your army — track deployment on the Hero Phase tab</div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {MANIFESTATIONS.map(m => {
+            const selected = selectedManifestations.includes(m.id);
+            return (
+              <button key={m.id} className="lrl-btn" onClick={() => toggleManifestation(m.id)}
+                style={{ fontFamily: 'Cinzel,serif', cursor: 'pointer', borderRadius: 8, padding: '8px 12px', border: '1px solid', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 2, transition: 'filter .15s, box-shadow .15s', background: selected ? m.bg : 'var(--bg-card)', borderColor: selected ? m.border : 'var(--border)', color: selected ? m.color : 'var(--text-secondary)' }}>
+                <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.05em' }}>{m.name}</span>
+                <span style={{ fontSize: 11, opacity: 0.75 }}>{m.type} · Cast {m.castValue}+</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 

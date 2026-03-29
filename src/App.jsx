@@ -34,8 +34,9 @@ export default function App() {
   const [pendingRune,   setPendingRune]   = useState(null);
   const [pendingUnits,  setPendingUnits]  = useState([]);
   const [expandedId,    setExpandedId]    = useState(null);
-  const [selectedLores, setSelectedLores] = useState([]);
-  const [loaded,        setLoaded]        = useState(false);
+  const [selectedLores,          setSelectedLores]          = useState([]);
+  const [selectedManifestations, setSelectedManifestations] = useState([]);
+  const [loaded,                 setLoaded]                 = useState(false);
   const [theme,         setTheme]         = useState('light');
   const [saves,         setSaves]         = useState([]);
   const importRef = useRef(null);
@@ -45,6 +46,7 @@ export default function App() {
     const r = store.get('lrl_roster'); if (r) try { setRoster(JSON.parse(r.value)); } catch {}
     const g = store.get('lrl_game');   if (g) try { setGame(JSON.parse(g.value));   } catch {}
     const l = store.get('lrl_lores');  if (l) try { setSelectedLores(JSON.parse(l.value)); } catch {}
+    const m = store.get('lrl_manif'); if (m) try { setSelectedManifestations(JSON.parse(m.value)); } catch {}
     const t = store.get('lrl_theme');  if (t) setTheme(t.value === 'dark' ? 'dark' : 'light');
     const s = store.get('lrl_saves');  if (s) try { setSaves(JSON.parse(s.value)); } catch {}
     setLoaded(true);
@@ -53,6 +55,7 @@ export default function App() {
   useEffect(() => { if (!loaded) return; store.set('lrl_roster', JSON.stringify(roster)); }, [roster, loaded]);
   useEffect(() => { if (!loaded || game === null) return; store.set('lrl_game', JSON.stringify(game)); }, [game, loaded]);
   useEffect(() => { if (!loaded) return; store.set('lrl_lores', JSON.stringify(selectedLores)); }, [selectedLores, loaded]);
+  useEffect(() => { if (!loaded) return; store.set('lrl_manif', JSON.stringify(selectedManifestations)); }, [selectedManifestations, loaded]);
   useEffect(() => { if (!loaded) return; store.set('lrl_theme', theme); }, [theme, loaded]);
   useEffect(() => { if (!loaded) return; store.set('lrl_saves', JSON.stringify(saves)); }, [saves, loaded]);
 
@@ -60,9 +63,10 @@ export default function App() {
   const toggleTheme = () => setTheme(t => t === 'light' ? 'dark' : 'light');
 
   // ── Roster ────────────────────────────────────────────────────────────────
-  const addUnit         = (unit) => setRoster(r => [...r, { id: uid(), name: unit.name, points: unit.points, reinforced: false }]);
-  const deleteUnit      = (id) => setRoster(r => r.filter(u => u.id !== id));
-  const toggleReinforce = (id) => setRoster(r => r.map(u => u.id === id ? { ...u, reinforced: !u.reinforced } : u));
+  const addUnit              = (unit) => setRoster(r => [...r, { id: uid(), name: unit.name, points: unit.points, reinforced: false }]);
+  const deleteUnit           = (id) => setRoster(r => r.filter(u => u.id !== id));
+  const toggleReinforce      = (id) => setRoster(r => r.map(u => u.id === id ? { ...u, reinforced: !u.reinforced } : u));
+  const toggleManifestation  = (id) => setSelectedManifestations(s => s.includes(id) ? s.filter(x => x !== id) : [...s, id]);
 
   // ── Game ──────────────────────────────────────────────────────────────────
   const openStartGame = () => { setStartSel(roster.map(u => u.id)); setModal('start'); };
@@ -120,7 +124,7 @@ export default function App() {
 
   // ── Export / Import ────────────────────────────────────────────────────────
   const exportState = () => {
-    const data = { roster, game, selectedLores, exportedAt: new Date().toISOString(), version: VERSION };
+    const data = { roster, game, selectedLores, selectedManifestations, exportedAt: new Date().toISOString(), version: VERSION };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -139,6 +143,7 @@ export default function App() {
         if (data.roster) setRoster(data.roster);
         if (data.game !== undefined) setGame(data.game);
         if (data.selectedLores) setSelectedLores(data.selectedLores);
+        if (data.selectedManifestations) setSelectedManifestations(data.selectedManifestations);
       } catch { alert('Could not read file — invalid format.'); }
     };
     reader.readAsText(file);
@@ -212,12 +217,13 @@ export default function App() {
 
         {/* ROSTER TAB */}
         {tab === 'roster' && (
-          <RosterTab roster={roster} game={game} addUnit={addUnit} deleteUnit={deleteUnit} toggleReinforce={toggleReinforce} />
+          <RosterTab roster={roster} game={game} addUnit={addUnit} deleteUnit={deleteUnit} toggleReinforce={toggleReinforce}
+            selectedManifestations={selectedManifestations} toggleManifestation={toggleManifestation} />
         )}
 
         {/* HERO PHASE TAB */}
         {tab === 'hero-phase' && (
-          <HeroPhaseTab game={game} setGame={setGame} />
+          <HeroPhaseTab game={game} setGame={setGame} selectedManifestations={selectedManifestations} />
         )}
 
         {/* SPELLS TAB */}
