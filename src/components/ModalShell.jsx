@@ -3,8 +3,8 @@ export default function ModalShell({ children, title, onClose }) {
     <div
       role="dialog" aria-modal="true" aria-label={title}
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}
-      style={{ position: 'fixed', inset: 0, background: 'rgba(26,22,20,0.55)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 999 }}>
-      <div style={{ background: 'var(--bg-modal)', border: '1px solid var(--border)', width: '100%', maxWidth: 600, maxHeight: '88vh', overflow: 'auto', borderRadius: '12px 12px 0 0', boxShadow: 'var(--shadow-modal)' }}>
+      style={{ position: 'fixed', inset: 0, background: 'rgba(26,22,20,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999, padding: '16px' }}>
+      <div style={{ background: 'var(--bg-modal)', border: '1px solid var(--border)', width: '100%', maxWidth: 600, maxHeight: '90vh', overflow: 'auto', borderRadius: 12, boxShadow: 'var(--shadow-modal)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid var(--border-subtle)', position: 'sticky', top: 0, background: 'var(--bg-modal)', zIndex: 1 }}>
           <div style={{ fontFamily: 'Cinzel,serif', fontSize: 13, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--accent)', fontWeight: 700 }}>{title}</div>
           <button onClick={onClose} aria-label="Close"
