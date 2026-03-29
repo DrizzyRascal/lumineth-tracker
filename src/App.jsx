@@ -501,13 +501,14 @@ export default function App() {
                     ↩ Undo
                   </button>
                 )}
-                <button className="lrl-btn" onClick={openNextRound} style={btnSecondary}>Next Round →</button>
-                <button className="lrl-btn" onClick={saveCurrentBattle} title="Save current battle state"
-                  style={{ ...btnGhost, fontSize: 11 }}
-                  aria-label="Save current battle">
-                  ✦ Save
+                {game.round < 5
+                  ? <button className="lrl-btn" onClick={openNextRound} style={btnSecondary}>Next Round →</button>
+                  : <button className="lrl-btn" onClick={openEndGame} style={btnSecondary}>End Battle →</button>
+                }
+                <button className="lrl-btn" onClick={openEndGame}
+                  style={{ ...btnGhost, color: '#c0392b', borderColor: 'rgba(192,57,43,0.4)', background: 'rgba(192,57,43,0.06)' }}>
+                  End
                 </button>
-                <button className="lrl-btn" onClick={openEndGame} style={btnGhost}>End</button>
               </div>
             </div>
 

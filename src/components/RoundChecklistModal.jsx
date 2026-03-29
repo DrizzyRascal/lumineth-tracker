@@ -3,11 +3,14 @@ import ModalShell from './ModalShell.jsx';
 export default function RoundChecklistModal({ currentRound, nextRound, game, onConfirm, onClose }) {
   const hasAcolyteHero = !!game.acolyteHeroId;
   const hasAuras = game.sevirethAuraOn || game.lyriorAuraOn || game.avalenorAuraOn;
+  const isFinalRound = nextRound > 5;
 
   return (
-    <ModalShell title={`Advance to Round ${nextRound}`} onClose={onClose}>
+    <ModalShell title={isFinalRound ? 'End of Battle' : `Advance to Round ${nextRound}`} onClose={onClose}>
       <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 20, lineHeight: 1.6 }}>
-        Before advancing, check these reminders for Round {nextRound}:
+        {isFinalRound
+          ? 'Round 5 is complete — the battle is over. Check these reminders before ending:'
+          : `Before advancing, check these reminders for Round ${nextRound}:`}
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
@@ -46,8 +49,8 @@ export default function RoundChecklistModal({ currentRound, nextRound, game, onC
           Stay in Round {currentRound}
         </button>
         <button className="lrl-btn" onClick={onConfirm}
-          style={{ fontFamily: 'Cinzel,serif', fontSize: 12, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '14px 24px', background: 'var(--accent)', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 700, borderRadius: 6 }}>
-          Advance to Round {nextRound} →
+          style={{ fontFamily: 'Cinzel,serif', fontSize: 12, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '14px 24px', background: isFinalRound ? '#c0392b' : 'var(--accent)', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 700, borderRadius: 6 }}>
+          {isFinalRound ? 'End Battle' : `Advance to Round ${nextRound} →`}
         </button>
       </div>
     </ModalShell>
