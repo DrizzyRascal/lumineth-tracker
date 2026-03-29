@@ -132,7 +132,7 @@ export default function App() {
   const toggleTheme = () => setTheme(t => t === 'light' ? 'dark' : 'light');
 
   // ── Roster ────────────────────────────────────────────────────────────────
-  const addUnit              = (unit) => setRoster(r => [...r, { id: uid(), name: unit.name, points: unit.points, reinforced: false }]);
+  const addUnit              = (unit) => setRoster(r => [...r, { id: uid(), name: unit.name, points: unit.points, reinforced: false, acolyteOfRunes: false }]);
   const deleteUnit           = (id) => setRoster(r => r.filter(u => u.id !== id));
   const toggleReinforce      = (id) => setRoster(r => r.map(u => u.id === id ? { ...u, reinforced: !u.reinforced } : u));
   const toggleManifestation  = (id) => setSelectedManifestations(s => s.includes(id) ? s.filter(x => x !== id) : [...s, id]);
@@ -166,7 +166,7 @@ export default function App() {
 
   // ── Depict Rune ───────────────────────────────────────────────────────────
   const openDepict = () => {
-    const hasAcolyteHero = activeUnits.some(u => u.acolyteOfRunes);
+    const hasAcolyteHero = roster.some(u => u.acolyteOfRunes);
     setAddStep(hasAcolyteHero ? 0 : 1);
     setPendingRune(null);
     setPendingUnits([]);
