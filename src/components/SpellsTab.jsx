@@ -1,7 +1,9 @@
-import { SPELL_LORES, HERO_SPELLS } from '../data.js';
+import { useState } from 'react';
+import { SPELL_LORES, HERO_SPELLS, MANIFESTATIONS } from '../data.js';
 import SpellCard from './SpellCard.jsx';
 
 export default function SpellsTab({ selectedLores, setSelectedLores, game, roster }) {
+  const [manifestOpen, setManifestOpen] = useState(false);
   const toggleLore = (id) => setSelectedLores(s => s.includes(id) ? s.filter(x => x !== id) : [...s, id]);
 
   const relevantUnits = game
@@ -89,6 +91,37 @@ export default function SpellsTab({ selectedLores, setSelectedLores, game, roste
           Add heroes to your Roster to see their individual spells here.
         </div>
       )}
+
+      {/* Manifestations of Hysh */}
+      <div style={{ marginTop: 32, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden', boxShadow: 'var(--shadow-card)' }}>
+        <button onClick={() => setManifestOpen(o => !o)} aria-expanded={manifestOpen}
+          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 18px', width: '100%', background: 'var(--bg-muted)', border: 'none', cursor: 'pointer', borderBottom: manifestOpen ? '1px solid var(--border-subtle)' : 'none' }}>
+          <div>
+            <div style={{ fontFamily: 'Cinzel,serif', fontSize: 13, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.05em' }}>Manifestations of Hysh</div>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>Summon spells — track in-battle status on the Hero Phase tab</div>
+          </div>
+          <span style={{ color: 'var(--text-dim)', fontSize: 14 }} aria-hidden="true">{manifestOpen ? '▲' : '▼'}</span>
+        </button>
+        {manifestOpen && (
+          <div style={{ padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {MANIFESTATIONS.map(m => (
+              <div key={m.id} style={{ background: m.bg, border: `1px solid ${m.border}`, borderRadius: 10, padding: '14px 16px' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 6 }}>
+                  <span style={{ fontFamily: 'Cinzel,serif', fontSize: 14, fontWeight: 700, color: m.color }}>{m.name}</span>
+                  <span style={{ fontFamily: 'Cinzel,serif', fontSize: 11, color: m.color, opacity: 0.8 }}>{m.type}</span>
+                  <span style={{ marginLeft: 'auto', fontFamily: 'Cinzel,serif', fontSize: 12, fontWeight: 700, color: m.color }}>Cast {m.castValue}+</span>
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 4 }}>
+                  <span style={{ fontWeight: 600, color: 'var(--text-secondary)' }}>Declare: </span>{m.summonDeclare}
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                  <span style={{ fontWeight: 600, color: 'var(--text-secondary)' }}>Effect: </span>{m.summonEffect}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

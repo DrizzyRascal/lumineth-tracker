@@ -15,6 +15,7 @@ import AcolytePickModal from './components/AcolytePickModal.jsx';
 import TeclisDiscsModal from './components/TeclisDiscsModal.jsx';
 import RoundChecklistModal from './components/RoundChecklistModal.jsx';
 import BattleSummaryModal from './components/BattleSummaryModal.jsx';
+import HeroPhaseTab from './components/HeroPhaseTab.jsx';
 
 const VERSION = 'v1.1 · 28 Mar 2026';
 
@@ -68,7 +69,8 @@ export default function App() {
   const startGame     = () => {
     setGame({ round: 1, activeUnitIds: startSel, battleScripture: [],
       acolyteHeroId: null, teclisDiscsUsed: false,
-      sevirethAuraOn: false, lyriorAuraOn: false, avalenorAuraOn: false });
+      sevirethAuraOn: false, lyriorAuraOn: false, avalenorAuraOn: false,
+      manifestationsInBattle: [], arcaneCharges: 0 });
     setModal(null);
   };
   const openEndGame = () => setModal('battle-summary');
@@ -194,7 +196,7 @@ export default function App() {
             <div style={{ fontFamily: 'Cinzel,serif', fontSize: 19, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.04em', marginTop: 1 }}>Lumineth Realm-lords</div>
           </div>
           <div style={{ display: 'flex', marginTop: 10 }}>
-            {[['game', 'Battle'], ['spells', 'Spells'], ['roster', 'Roster']].map(([key, label]) => (
+            {[['game', 'Battle'], ['hero-phase', 'Hero Phase'], ['spells', 'Spells'], ['roster', 'Roster']].map(([key, label]) => (
               <button key={key} className="lrl-tab" onClick={() => setTab(key)}
                 aria-current={tab === key ? 'page' : undefined}
                 style={{ fontFamily: 'Cinzel,serif', fontSize: 12, letterSpacing: '0.15em', textTransform: 'uppercase', padding: '10px 24px', background: 'transparent', border: 'none', borderBottom: tab === key ? `2px solid var(--accent)` : '2px solid transparent', color: tab === key ? 'var(--accent)' : 'var(--text-muted)', cursor: 'pointer', marginBottom: -1, fontWeight: tab === key ? 700 : 500, minHeight: 44, transition: 'color 0.18s, border-color 0.18s' }}>
@@ -211,6 +213,11 @@ export default function App() {
         {/* ROSTER TAB */}
         {tab === 'roster' && (
           <RosterTab roster={roster} game={game} addUnit={addUnit} deleteUnit={deleteUnit} toggleReinforce={toggleReinforce} />
+        )}
+
+        {/* HERO PHASE TAB */}
+        {tab === 'hero-phase' && (
+          <HeroPhaseTab game={game} setGame={setGame} />
         )}
 
         {/* SPELLS TAB */}

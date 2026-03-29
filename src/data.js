@@ -83,6 +83,8 @@ export const UNIT_DATA = [
   { name: 'Vanari Dawnriders',                             points: 180, keywords: ['AELF', 'VANARI', 'CAVALRY'],   isHero: false, canReinforce: true  },
   { name: 'Vanari Starshard Ballista',                     points: 120, keywords: ['VANARI', 'WAR MACHINE'],       isHero: false, canReinforce: false },
   { name: 'Ydrilan Riverblades',                           points: 140, keywords: ['AELF', 'INFANTRY'],            isHero: false, canReinforce: false },
+  // ── Faction Terrain ──────────────────────────────────────────────────────────
+  { name: 'Shrine Luminor',                                points: 0,   keywords: ['FACTION TERRAIN'],             isHero: false, canReinforce: false, isTerrain: true },
 ];
 
 export const UNIT_KEYWORDS = Object.fromEntries(UNIT_DATA.map(u => [u.name, u.keywords]));
@@ -96,6 +98,57 @@ export const WARSCROLL_REMINDERS = {
     : [{ text: 'Spirit of the Wind: no Oreali on scripture \u2014 no bonus movement', active: false }],
 };
 
+
+export const MANIFESTATIONS = [
+  {
+    id: 'hyshian-twinstones',
+    name: 'Hyshian Twinstones',
+    type: 'Endless Spell',
+    castValue: 6,
+    color: '#7a520a', bg: 'rgba(122,82,10,0.08)', border: 'rgba(122,82,10,0.22)',
+    summonDeclare: 'Pick a friendly LUMINETH REALM-LORDS WIZARD to cast this spell, then make a casting roll of 2D6.',
+    summonEffect: 'Set up 1 Hyshian Twinstones token on the battlefield within 12\u2033 of the caster.',
+    abilities: [
+      {
+        id: 'reservoir-of-power',
+        name: 'Reservoir of Power',
+        timing: 'passive',
+        timingLabel: 'Passive',
+        effect: 'Each time a unit casts a spell and it is not unbound while this model is on the battlefield, add 1 arcane charge point (max 6).',
+      },
+      {
+        id: 'release-arcane-charge',
+        name: 'Release Arcane Charge',
+        timing: 'any',
+        timingLabel: 'Any Hero Phase',
+        keywords: ['REACTION', 'ONCE PER TURN (ARMY)'],
+        trigger: 'A friendly LUMINETH REALM-LORDS WIZARD within 3\u2033 of this model declares a SPELL or UNBIND ability.',
+        effect: 'Add the current arcane charge total to that WIZARD\u2019s casting or unbinding roll, then reset the arcane charge counter to 0.',
+        tracksArcaneCharge: true,
+      },
+    ],
+  },
+  {
+    id: 'rune-of-petrification',
+    name: 'Rune of Petrification',
+    type: 'Manifestation',
+    castValue: 7,
+    color: '#5c3a9e', bg: 'rgba(92,58,158,0.08)', border: 'rgba(92,58,158,0.22)',
+    summonDeclare: 'Pick a friendly LUMINETH REALM-LORDS WIZARD to cast this spell, then make a casting roll of 2D6.',
+    summonEffect: 'Set up 1 Rune of Petrification token on the battlefield within 12\u2033 of the caster.',
+    abilities: [],
+  },
+  {
+    id: 'sanctum-of-amyntok',
+    name: 'Sanctum of Amyntok',
+    type: 'Manifestation',
+    castValue: 7,
+    color: '#1a5c96', bg: 'rgba(26,92,150,0.08)', border: 'rgba(26,92,150,0.22)',
+    summonDeclare: 'Pick a friendly LUMINETH REALM-LORDS WIZARD to cast this spell, then make a casting roll of 2D6.',
+    summonEffect: 'Set up the 3 Sanctum of Amyntok tokens within 12\u2033 of the caster and more than 3\u2033 from all enemy units.',
+    abilities: [],
+  },
+];
 
 export const SPELL_LORES = [
   {

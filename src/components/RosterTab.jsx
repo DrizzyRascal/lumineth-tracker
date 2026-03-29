@@ -46,7 +46,8 @@ export default function RosterTab({ roster, game, addUnit, deleteUnit, toggleRei
 
   const heroes  = UNIT_DATA.filter(u => u.isHero && !u.scourgeOfGhyran);
   const scourge = UNIT_DATA.filter(u => u.scourgeOfGhyran);
-  const units   = UNIT_DATA.filter(u => !u.isHero);
+  const units   = UNIT_DATA.filter(u => !u.isHero && !u.isTerrain);
+  const terrain = UNIT_DATA.filter(u => u.isTerrain);
 
   return (
     <div>
@@ -89,8 +90,14 @@ export default function RosterTab({ roster, game, addUnit, deleteUnit, toggleRei
         </div>
 
         <div style={{ ...SECTION_LABEL, marginBottom: 14 }}>Units</div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
           {units.map(u => <UnitButton key={u.name} unit={u} onClick={() => addUnit(u)} />)}
+        </div>
+
+        <div style={{ ...SECTION_LABEL, marginBottom: 8 }}>Faction Terrain</div>
+        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 10 }}>Included at no points cost</div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {terrain.map(u => <UnitButton key={u.name} unit={u} onClick={() => addUnit(u)} />)}
         </div>
       </div>
 
@@ -107,6 +114,7 @@ export default function RosterTab({ roster, game, addUnit, deleteUnit, toggleRei
             const isScourge = unit.name.includes('Scourge of Ghyran');
             const meta      = UNIT_META[unit.name];
             const canReinforce = meta?.canReinforce ?? false;
+            const isTerrain   = meta?.isTerrain ?? false;
             const effectivePts = unit.reinforced ? (unit.points || 0) * 2 : (unit.points || 0);
             return (
               <div key={unit.id} style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--bg-card)', border: `1px solid ${isScourge ? 'rgba(34,139,34,0.3)' : unit.reinforced ? 'var(--border-accent)' : 'var(--border)'}`, padding: '10px 16px', borderRadius: 10 }}>
@@ -115,6 +123,8 @@ export default function RosterTab({ roster, game, addUnit, deleteUnit, toggleRei
                     <span style={{ fontSize: 14, color: isScourge ? '#2d8b3a' : 'var(--text-primary)', fontFamily: 'Cinzel,serif', fontWeight: 600 }}>{unit.name}</span>
                     {unit.reinforced
                       ? <span style={{ fontSize: 11, fontFamily: 'Cinzel,serif', color: 'var(--accent)', fontWeight: 600 }}>{effectivePts} pts <span style={{ opacity: 0.7 }}>(2×{unit.points})</span></span>
+                      : isTerrain
+                      ? <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'Cinzel,serif' }}>Free</span>
                       : unit.points
                       ? <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'Cinzel,serif' }}>{unit.points} pts</span>
                       : null}
