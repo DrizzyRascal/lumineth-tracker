@@ -73,16 +73,16 @@ export const UNIT_DATA = [
   { name: 'The Light of Eltharion (Scourge of Ghyran)',   points: 280, keywords: ['HERO'],            isHero: true, scourgeOfGhyran: true },
   { name: 'Vanari Bannerblade (Scourge of Ghyran)',        points: 140, keywords: ['VANARI', 'HERO'],  isHero: true, scourgeOfGhyran: true },
   // ── Units ────────────────────────────────────────────────────────────────────
-  { name: 'Alarith Spirit of the Mountain',                points: 340, keywords: ['ALARITH', 'MONSTER'],          isHero: false },
-  { name: 'Alarith Stoneguard',                            points: 130, keywords: ['AELF', 'ALARITH', 'INFANTRY'], isHero: false },
-  { name: 'Hurakan Spirit of the Wind',                    points: 270, keywords: ['HURAKAN', 'MONSTER'],          isHero: false },
-  { name: 'Hurakan Windchargers',                          points: 160, keywords: ['AELF', 'HURAKAN', 'CAVALRY'],  isHero: false },
-  { name: 'Vanari Auralan Sentinels',                      points: 140, keywords: ['AELF', 'VANARI', 'INFANTRY'],  isHero: false },
-  { name: 'Vanari Auralan Wardens',                        points: 120, keywords: ['AELF', 'VANARI', 'INFANTRY'],  isHero: false },
-  { name: 'Vanari Bladelords',                             points: 150, keywords: ['AELF', 'VANARI', 'INFANTRY'],  isHero: false },
-  { name: 'Vanari Dawnriders',                             points: 180, keywords: ['AELF', 'VANARI', 'CAVALRY'],   isHero: false },
-  { name: 'Vanari Starshard Ballista',                     points: 120, keywords: ['VANARI', 'WAR MACHINE'],       isHero: false },
-  { name: 'Ydrilan Riverblades',                           points: 140, keywords: ['AELF', 'INFANTRY'],            isHero: false },
+  { name: 'Alarith Spirit of the Mountain',                points: 340, keywords: ['ALARITH', 'MONSTER'],          isHero: false, canReinforce: false },
+  { name: 'Alarith Stoneguard',                            points: 130, keywords: ['AELF', 'ALARITH', 'INFANTRY'], isHero: false, canReinforce: true  },
+  { name: 'Hurakan Spirit of the Wind',                    points: 270, keywords: ['HURAKAN', 'MONSTER'],          isHero: false, canReinforce: false },
+  { name: 'Hurakan Windchargers',                          points: 160, keywords: ['AELF', 'HURAKAN', 'CAVALRY'],  isHero: false, canReinforce: true  },
+  { name: 'Vanari Auralan Sentinels',                      points: 140, keywords: ['AELF', 'VANARI', 'INFANTRY'],  isHero: false, canReinforce: true  },
+  { name: 'Vanari Auralan Wardens',                        points: 120, keywords: ['AELF', 'VANARI', 'INFANTRY'],  isHero: false, canReinforce: true  },
+  { name: 'Vanari Bladelords',                             points: 150, keywords: ['AELF', 'VANARI', 'INFANTRY'],  isHero: false, canReinforce: true  },
+  { name: 'Vanari Dawnriders',                             points: 180, keywords: ['AELF', 'VANARI', 'CAVALRY'],   isHero: false, canReinforce: true  },
+  { name: 'Vanari Starshard Ballista',                     points: 120, keywords: ['VANARI', 'WAR MACHINE'],       isHero: false, canReinforce: false },
+  { name: 'Ydrilan Riverblades',                           points: 140, keywords: ['AELF', 'INFANTRY'],            isHero: false, canReinforce: false },
 ];
 
 export const UNIT_KEYWORDS = Object.fromEntries(UNIT_DATA.map(u => [u.name, u.keywords]));

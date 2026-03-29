@@ -59,8 +59,9 @@ export default function App() {
   const toggleTheme = () => setTheme(t => t === 'light' ? 'dark' : 'light');
 
   // ── Roster ────────────────────────────────────────────────────────────────
-  const addUnit    = (unit) => setRoster(r => [...r, { id: uid(), name: unit.name, points: unit.points }]);
-  const deleteUnit = (id) => setRoster(r => r.filter(u => u.id !== id));
+  const addUnit         = (unit) => setRoster(r => [...r, { id: uid(), name: unit.name, points: unit.points, reinforced: false }]);
+  const deleteUnit      = (id) => setRoster(r => r.filter(u => u.id !== id));
+  const toggleReinforce = (id) => setRoster(r => r.map(u => u.id === id ? { ...u, reinforced: !u.reinforced } : u));
 
   // ── Game ──────────────────────────────────────────────────────────────────
   const openStartGame = () => { setStartSel(roster.map(u => u.id)); setModal('start'); };
@@ -209,7 +210,7 @@ export default function App() {
 
         {/* ROSTER TAB */}
         {tab === 'roster' && (
-          <RosterTab roster={roster} game={game} addUnit={addUnit} deleteUnit={deleteUnit} />
+          <RosterTab roster={roster} game={game} addUnit={addUnit} deleteUnit={deleteUnit} toggleReinforce={toggleReinforce} />
         )}
 
         {/* SPELLS TAB */}

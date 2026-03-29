@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { UNIT_DATA } from '../data.js';
 import { getKeywords } from '../utils.js';
 
+const UNIT_META = Object.fromEntries(UNIT_DATA.map(u => [u.name, u]));
+
 const POINT_LIMITS = [500, 1000, 1500, 2000, 2500, 3000];
 
 const SECTION_LABEL = {
@@ -33,10 +35,10 @@ function UnitButton({ unit, onClick }) {
   );
 }
 
-export default function RosterTab({ roster, game, addUnit, deleteUnit }) {
+export default function RosterTab({ roster, game, addUnit, deleteUnit, toggleReinforce }) {
   const [limit, setLimit] = useState(2000);
 
-  const totalPoints = roster.reduce((sum, u) => sum + (u.points || 0), 0);
+  const totalPoints = roster.reduce((sum, u) => sum + (u.reinforced ? (u.points || 0) * 2 : (u.points || 0)), 0);
   const pct         = Math.min(totalPoints / limit, 1);
   const overLimit   = totalPoints > limit;
   const atLimit     = totalPoints === limit;
@@ -101,14 +103,22 @@ export default function RosterTab({ roster, game, addUnit, deleteUnit }) {
         ? <div style={{ fontSize: 14, color: 'var(--text-placeholder)', fontStyle: 'italic' }}>Your roster is empty — add units above.</div>
         : <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {roster.map(unit => {
-            const keywords = getKeywords(unit.name);
+            const keywords  = getKeywords(unit.name);
             const isScourge = unit.name.includes('Scourge of Ghyran');
+            const meta      = UNIT_META[unit.name];
+            const canReinforce = meta?.canReinforce ?? false;
+            const effectivePts = unit.reinforced ? (unit.points || 0) * 2 : (unit.points || 0);
             return (
-              <div key={unit.id} style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--bg-card)', border: `1px solid ${isScourge ? 'rgba(34,139,34,0.3)' : 'var(--border)'}`, padding: '10px 16px', borderRadius: 10 }}>
+              <div key={unit.id} style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--bg-card)', border: `1px solid ${isScourge ? 'rgba(34,139,34,0.3)' : unit.reinforced ? 'var(--border-accent)' : 'var(--border)'}`, padding: '10px 16px', borderRadius: 10 }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                     <span style={{ fontSize: 14, color: isScourge ? '#2d8b3a' : 'var(--text-primary)', fontFamily: 'Cinzel,serif', fontWeight: 600 }}>{unit.name}</span>
-                    {unit.points && <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'Cinzel,serif' }}>{unit.points} pts</span>}
+                    {unit.reinforced
+                      ? <span style={{ fontSize: 11, fontFamily: 'Cinzel,serif', color: 'var(--accent)', fontWeight: 600 }}>{effectivePts} pts <span style={{ opacity: 0.7 }}>(2×{unit.points})</span></span>
+                      : unit.points
+                      ? <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'Cinzel,serif' }}>{unit.points} pts</span>
+                      : null}
+                    {unit.reinforced && <span style={{ fontSize: 9, fontFamily: 'Cinzel,serif', letterSpacing: '0.1em', background: 'var(--bg-accent-medium)', color: 'var(--accent)', border: '1px solid var(--border-accent)', padding: '2px 7px', borderRadius: 8, textTransform: 'uppercase' }}>Reinforced</span>}
                   </div>
                   {keywords.length > 0 && (
                     <div style={{ display: 'flex', gap: 4, marginTop: 4, flexWrap: 'wrap' }}>
@@ -118,6 +128,12 @@ export default function RosterTab({ roster, game, addUnit, deleteUnit }) {
                     </div>
                   )}
                 </div>
+                {canReinforce && (
+                  <button className="lrl-btn" onClick={() => toggleReinforce(unit.id)}
+                    style={{ fontFamily: 'Cinzel,serif', fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '6px 10px', borderRadius: 8, cursor: 'pointer', whiteSpace: 'nowrap', border: '1px solid', background: unit.reinforced ? 'var(--bg-accent-medium)' : 'transparent', color: unit.reinforced ? 'var(--accent)' : 'var(--text-muted)', borderColor: unit.reinforced ? 'var(--border-accent)' : 'var(--border-subtle)' }}>
+                    {unit.reinforced ? '× Undo' : '+ Reinforce'}
+                  </button>
+                )}
                 <button onClick={() => deleteUnit(unit.id)} aria-label={`Remove ${unit.name}`}
                   style={{ background: 'none', border: 'none', color: 'var(--accent-dim)', cursor: 'pointer', fontSize: 22, padding: '0 6px', lineHeight: 1, minWidth: 44, minHeight: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   onMouseEnter={e => e.currentTarget.style.color = '#b84040'}
