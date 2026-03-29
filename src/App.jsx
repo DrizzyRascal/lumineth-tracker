@@ -250,8 +250,16 @@ export default function App() {
 
           {/* ── Brand (left) ── */}
           <div style={{ flex: '0 0 auto', marginRight: 6 }}>
-            <div style={{ fontFamily: 'Cinzel,serif', fontSize: 8, letterSpacing: '0.22em', color: 'var(--text-muted)', textTransform: 'uppercase', lineHeight: 1, marginBottom: 3 }}>Warhammer Age of Sigmar</div>
-            <div style={{ fontFamily: 'Cinzel,serif', fontSize: 15, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.1em', textTransform: 'uppercase', lineHeight: 1 }}>AOS Lumineth Tracker</div>
+            <div style={{ fontFamily: 'Cinzel,serif', fontSize: 8, letterSpacing: '0.25em', color: 'var(--text-muted)', textTransform: 'uppercase', lineHeight: 1, marginBottom: 4 }}>Warhammer · Age of Sigmar</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+              {/* Rune diamond mark */}
+              <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style={{ flexShrink: 0 }}>
+                <polygon points="12,2 22,12 12,22 2,12" fill="none" stroke="var(--accent)" strokeWidth="1.8"/>
+                <polygon points="12,6 18,12 12,18 6,12" fill="var(--accent)" opacity="0.35"/>
+                <circle cx="12" cy="12" r="2.2" fill="var(--accent)"/>
+              </svg>
+              <div style={{ fontFamily: 'Cinzel,serif', fontSize: 16, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.08em', textTransform: 'uppercase', lineHeight: 1 }}>AOS Lumineth Tracker</div>
+            </div>
           </div>
 
           {/* ── Spacer ── */}
@@ -270,13 +278,14 @@ export default function App() {
                 ))}
               </nav>
 
-              {/* Theme toggle button */}
+              {/* Theme toggle button — navy bg always, yellow sun or white moon */}
               <button className="lrl-btn" onClick={toggleTheme} aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 38, height: 38, borderRadius: 7, border: 'none', cursor: 'pointer', fontSize: 18, lineHeight: 1, marginRight: 4, flexShrink: 0,
-                  background: theme === 'dark' ? '#ffffff' : '#f0b429',
-                  color:      theme === 'dark' ? '#f0b429'  : '#ffffff',
-                  boxShadow: '0 1px 4px rgba(0,0,0,0.14)' }}>
-                {theme === 'dark' ? '☀' : '☽'}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 38, height: 38, borderRadius: 7, border: 'none', cursor: 'pointer', lineHeight: 1, marginRight: 4, flexShrink: 0,
+                  background: '#0f2744', boxShadow: '0 2px 8px rgba(0,0,0,0.22)' }}>
+                {theme === 'dark'
+                  ? /* Sun SVG */ <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="#f0b429"/><g stroke="#f0b429" strokeWidth="2" strokeLinecap="round"><line x1="12" y1="2" x2="12" y2="4.5"/><line x1="12" y1="19.5" x2="12" y2="22"/><line x1="2" y1="12" x2="4.5" y2="12"/><line x1="19.5" y1="12" x2="22" y2="12"/><line x1="4.93" y1="4.93" x2="6.76" y2="6.76"/><line x1="17.24" y1="17.24" x2="19.07" y2="19.07"/><line x1="19.07" y1="4.93" x2="17.24" y2="6.76"/><line x1="6.76" y1="17.24" x2="4.93" y2="19.07"/></g></svg>
+                  : /* Moon SVG */ <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z" fill="#ffffff" stroke="#ffffff" strokeWidth="1.5" strokeLinejoin="round"/></svg>
+                }
               </button>
 
               {/* Auth */}
@@ -290,19 +299,22 @@ export default function App() {
                       style={{ width: 28, height: 28, borderRadius: '50%', border: '2px solid var(--border-accent)' }} />
                   )}
                   <button className="lrl-btn" onClick={signOutUser}
-                    style={{ fontFamily: 'Cinzel,serif', fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '8px 14px', background: 'transparent', color: 'var(--text-muted)', border: '1px solid var(--border)', cursor: 'pointer', borderRadius: 7, whiteSpace: 'nowrap' }}>
+                    style={{ height: 38, fontFamily: 'Cinzel,serif', fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '0 14px', background: 'transparent', color: 'var(--text-muted)', border: '1px solid var(--border)', cursor: 'pointer', borderRadius: 7, whiteSpace: 'nowrap' }}>
                     Sign out
                   </button>
                 </div>
               ) : (
                 <button className="lrl-btn" onClick={signIn}
-                  style={{ display: 'flex', alignItems: 'center', gap: 7, fontFamily: 'Cinzel,serif', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '9px 18px', background: 'var(--accent)', color: '#fff', border: 'none', cursor: 'pointer', borderRadius: 7, fontWeight: 700, whiteSpace: 'nowrap', boxShadow: '0 2px 8px rgba(0,0,0,0.18)' }}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true" style={{ flexShrink: 0 }}>
-                    <path fill="#fff" fillOpacity="0.9" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                    <path fill="#fff" fillOpacity="0.75" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                    <path fill="#fff" fillOpacity="0.6" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
-                    <path fill="#fff" fillOpacity="0.85" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                  </svg>
+                  style={{ display: 'flex', alignItems: 'center', gap: 8, height: 38, fontFamily: 'Cinzel,serif', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '0 16px', background: 'var(--accent)', color: '#fff', border: 'none', cursor: 'pointer', borderRadius: 7, fontWeight: 700, whiteSpace: 'nowrap', boxShadow: '0 2px 8px rgba(0,0,0,0.22)' }}>
+                  {/* Coloured Google G badge */}
+                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 20, height: 20, borderRadius: '50%', background: '#fff', flexShrink: 0 }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true">
+                      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+                      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                  </span>
                   Sign in
                 </button>
               )}
@@ -314,11 +326,12 @@ export default function App() {
             <>
               {/* Theme toggle */}
               <button className="lrl-btn" onClick={toggleTheme} aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 36, height: 36, borderRadius: 7, border: 'none', cursor: 'pointer', fontSize: 17, lineHeight: 1, flexShrink: 0,
-                  background: theme === 'dark' ? '#ffffff' : '#f0b429',
-                  color:      theme === 'dark' ? '#f0b429'  : '#ffffff',
-                  boxShadow: '0 1px 4px rgba(0,0,0,0.14)' }}>
-                {theme === 'dark' ? '☀' : '☽'}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 38, height: 38, borderRadius: 7, border: 'none', cursor: 'pointer', lineHeight: 1, flexShrink: 0,
+                  background: '#0f2744', boxShadow: '0 2px 8px rgba(0,0,0,0.22)' }}>
+                {theme === 'dark'
+                  ? <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="#f0b429"/><g stroke="#f0b429" strokeWidth="2" strokeLinecap="round"><line x1="12" y1="2" x2="12" y2="4.5"/><line x1="12" y1="19.5" x2="12" y2="22"/><line x1="2" y1="12" x2="4.5" y2="12"/><line x1="19.5" y1="12" x2="22" y2="12"/><line x1="4.93" y1="4.93" x2="6.76" y2="6.76"/><line x1="17.24" y1="17.24" x2="19.07" y2="19.07"/><line x1="19.07" y1="4.93" x2="17.24" y2="6.76"/><line x1="6.76" y1="17.24" x2="4.93" y2="19.07"/></g></svg>
+                  : <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z" fill="#ffffff" stroke="#ffffff" strokeWidth="1.5" strokeLinejoin="round"/></svg>
+                }
               </button>
 
               {/* Sync indicator when signed in */}
@@ -369,13 +382,15 @@ export default function App() {
                 </>
               ) : (
                 <button className="lrl-btn" onClick={() => { signIn(); setMenuOpen(false); }}
-                  style={{ display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'Cinzel,serif', fontSize: 12, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '12px 20px', background: 'var(--accent)', color: '#fff', border: 'none', cursor: 'pointer', borderRadius: 7, fontWeight: 700, width: '100%', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.18)' }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
-                    <path fill="#fff" fillOpacity="0.9" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                    <path fill="#fff" fillOpacity="0.75" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                    <path fill="#fff" fillOpacity="0.6" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
-                    <path fill="#fff" fillOpacity="0.85" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                  </svg>
+                  style={{ display: 'flex', alignItems: 'center', gap: 10, fontFamily: 'Cinzel,serif', fontSize: 12, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '13px 20px', background: 'var(--accent)', color: '#fff', border: 'none', cursor: 'pointer', borderRadius: 7, fontWeight: 700, width: '100%', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.18)' }}>
+                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 22, height: 22, borderRadius: '50%', background: '#fff', flexShrink: 0 }}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true">
+                      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+                      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                  </span>
                   Sign in with Google
                 </button>
               )}
