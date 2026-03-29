@@ -44,7 +44,6 @@ export default function App() {
   const [saves,         setSaves]         = useState([]);
   const [user,          setUser]          = useState(null);
   const [cloudSyncing,  setCloudSyncing]  = useState(false);
-  const importRef   = useRef(null);
   const syncEnabled = useRef(false);
   const saveTimer   = useRef(null);
 
@@ -205,34 +204,6 @@ export default function App() {
     return [...s, id];
   });
 
-  // ── Export / Import ────────────────────────────────────────────────────────
-  const exportState = () => {
-    const data = { roster, game, selectedLores, selectedManifestations, exportedAt: new Date().toISOString(), version: VERSION };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `lumineth-tracker-${new Date().toISOString().slice(0,10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-  const importState = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      try {
-        const data = JSON.parse(ev.target.result);
-        if (data.roster) setRoster(data.roster);
-        if (data.game !== undefined) setGame(data.game);
-        if (data.selectedLores) setSelectedLores(data.selectedLores);
-        if (data.selectedManifestations) setSelectedManifestations(data.selectedManifestations);
-      } catch { alert('Could not read file — invalid format.'); }
-    };
-    reader.readAsText(file);
-    e.target.value = '';
-  };
-
   // ── Battle Saves ──────────────────────────────────────────────────────────
   const saveCurrentBattle = () => {
     if (!game) return;
@@ -259,66 +230,62 @@ export default function App() {
 
       {/* ── HEADER ── */}
       <header style={{ background: 'var(--bg-card)', borderBottom: '1px solid var(--border)', borderTop: '3px solid var(--accent)', boxShadow: 'var(--shadow-panel)', position: 'sticky', top: 0, zIndex: 10 }}>
-        <div style={{ maxWidth: 860, margin: '0 auto', padding: '0 16px' }}>
-          <div style={{ paddingTop: 14, paddingBottom: 2 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: 6 }}>
-              <div style={{ fontFamily: 'Cinzel,serif', fontSize: 9, letterSpacing: '0.28em', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Warhammer Age of Sigmar</div>
-              <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                {/* Export / Import */}
-                <button onClick={exportState} title="Export state as JSON"
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-dim)', fontSize: 11, fontFamily: 'Cinzel,serif', letterSpacing: '0.06em', padding: '2px 4px' }}
-                  aria-label="Export state">↑ Export</button>
-                <button onClick={() => importRef.current?.click()} title="Import state from JSON"
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-dim)', fontSize: 11, fontFamily: 'Cinzel,serif', letterSpacing: '0.06em', padding: '2px 4px' }}
-                  aria-label="Import state">↓ Import</button>
-                <input ref={importRef} type="file" accept=".json" onChange={importState} style={{ display: 'none' }} />
-                {/* Theme toggle */}
-                <button onClick={toggleTheme} aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-                  title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-dim)', fontSize: 14, padding: '2px 4px', lineHeight: 1 }}>
-                  {theme === 'light' ? '◐' : '☀'}
-                </button>
-                {/* Cloud sync / Auth */}
-                {user ? (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    {cloudSyncing
-                      ? <span style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'Cinzel,serif' }}>↑ Saving…</span>
-                      : <span style={{ fontSize: 10, color: '#2d8b3a', fontFamily: 'Cinzel,serif' }}>☁ Saved</span>}
-                    {user.photoURL && (
-                      <img src={user.photoURL} alt={user.displayName ?? 'User'} referrerPolicy="no-referrer"
-                        style={{ width: 22, height: 22, borderRadius: '50%', border: '1px solid var(--border)' }} />
-                    )}
-                    <button onClick={signOutUser}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-dim)', fontSize: 10, fontFamily: 'Cinzel,serif', letterSpacing: '0.06em', padding: '2px 4px' }}>
-                      Sign out
-                    </button>
-                  </div>
-                ) : (
-                  <button onClick={signIn}
-                    style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'var(--bg-accent-faint)', border: '1px solid var(--border-accent)', borderRadius: 6, cursor: 'pointer', padding: '4px 9px', fontFamily: 'Cinzel,serif', fontSize: 10, letterSpacing: '0.06em', color: 'var(--accent)', fontWeight: 600 }}>
-                    <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true">
-                      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
-                      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                    </svg>
-                    Sign in
-                  </button>
-                )}
-                <div style={{ fontFamily: 'Cinzel,serif', fontSize: 9, color: 'var(--accent-dim)', letterSpacing: '0.05em' }}>{VERSION}</div>
-              </div>
-            </div>
-            <div style={{ fontFamily: 'Cinzel,serif', fontSize: 19, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.04em', marginTop: 1 }}>Lumineth Realm-lords</div>
+        <div style={{ maxWidth: 960, margin: '0 auto', padding: '0 16px', display: 'flex', alignItems: 'center', gap: 4, height: 56 }}>
+
+          {/* ── Brand (left) ── */}
+          <div style={{ flex: '0 0 auto', marginRight: 8 }}>
+            <div style={{ fontFamily: 'Cinzel,serif', fontSize: 8, letterSpacing: '0.22em', color: 'var(--text-muted)', textTransform: 'uppercase', lineHeight: 1, marginBottom: 3 }}>Warhammer Age of Sigmar</div>
+            <div style={{ fontFamily: 'Cinzel,serif', fontSize: 15, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.1em', textTransform: 'uppercase', lineHeight: 1 }}>AOS Lumineth Tracker</div>
           </div>
-          <div style={{ display: 'flex', marginTop: 10 }}>
+
+          {/* ── Spacer ── */}
+          <div style={{ flex: 1 }} />
+
+          {/* ── Tab nav (centre-right) ── */}
+          <nav style={{ display: 'flex', alignItems: 'stretch', height: '100%', marginRight: 8 }}>
             {[['game', 'Battle'], ['hero-phase', 'Hero Phase'], ['spells', 'Spells'], ['roster', 'Roster']].map(([key, label]) => (
               <button key={key} className="lrl-tab" onClick={() => setTab(key)}
                 aria-current={tab === key ? 'page' : undefined}
-                style={{ fontFamily: 'Cinzel,serif', fontSize: 12, letterSpacing: '0.15em', textTransform: 'uppercase', padding: '10px 24px', background: 'transparent', border: 'none', borderBottom: tab === key ? `2px solid var(--accent)` : '2px solid transparent', color: tab === key ? 'var(--accent)' : 'var(--text-muted)', cursor: 'pointer', marginBottom: -1, fontWeight: tab === key ? 700 : 500, minHeight: 44, transition: 'color 0.18s, border-color 0.18s' }}>
+                style={{ fontFamily: 'Cinzel,serif', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', padding: '0 18px', background: 'transparent', border: 'none', borderBottom: tab === key ? '3px solid var(--accent)' : '3px solid transparent', borderTop: '3px solid transparent', color: tab === key ? 'var(--accent)' : 'var(--text-muted)', cursor: 'pointer', fontWeight: tab === key ? 700 : 500, transition: 'color 0.18s, border-color 0.18s', whiteSpace: 'nowrap' }}>
                 {label}
               </button>
             ))}
-          </div>
+          </nav>
+
+          {/* ── Theme toggle ── */}
+          <button onClick={toggleTheme} aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-dim)', fontSize: 16, padding: '6px 8px', lineHeight: 1, marginRight: 4 }}>
+            {theme === 'light' ? '◐' : '☀'}
+          </button>
+
+          {/* ── Auth ── */}
+          {user ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              {cloudSyncing
+                ? <span style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'Cinzel,serif', whiteSpace: 'nowrap' }}>↑ Saving…</span>
+                : <span style={{ fontSize: 10, color: '#2d8b3a', fontFamily: 'Cinzel,serif', whiteSpace: 'nowrap' }}>☁ Saved</span>}
+              {user.photoURL && (
+                <img src={user.photoURL} alt={user.displayName ?? 'User'} referrerPolicy="no-referrer"
+                  style={{ width: 28, height: 28, borderRadius: '50%', border: '2px solid var(--border-accent)' }} />
+              )}
+              <button className="lrl-btn" onClick={signOutUser}
+                style={{ fontFamily: 'Cinzel,serif', fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '7px 12px', background: 'transparent', color: 'var(--text-muted)', border: '1px solid var(--border)', cursor: 'pointer', borderRadius: 6, whiteSpace: 'nowrap' }}>
+                Sign out
+              </button>
+            </div>
+          ) : (
+            <button className="lrl-btn" onClick={signIn}
+              style={{ display: 'flex', alignItems: 'center', gap: 7, fontFamily: 'Cinzel,serif', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '9px 18px', background: 'var(--accent)', color: '#fff', border: 'none', cursor: 'pointer', borderRadius: 7, fontWeight: 700, whiteSpace: 'nowrap', boxShadow: '0 2px 8px rgba(0,0,0,0.18)' }}>
+              <svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true" style={{ flexShrink: 0 }}>
+                <path fill="#fff" fillOpacity="0.9" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#fff" fillOpacity="0.75" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#fff" fillOpacity="0.6" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+                <path fill="#fff" fillOpacity="0.85" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              </svg>
+              Sign in
+            </button>
+          )}
         </div>
       </header>
 
