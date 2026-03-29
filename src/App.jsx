@@ -249,16 +249,19 @@ export default function App() {
         <div style={{ maxWidth: 960, margin: '0 auto', padding: '0 16px', display: 'flex', alignItems: 'center', gap: 6, height: 56 }}>
 
           {/* ── Brand (left) ── */}
-          <div style={{ flex: '0 0 auto', marginRight: 6 }}>
-            <div style={{ fontFamily: 'Cinzel,serif', fontSize: 8, letterSpacing: '0.25em', color: 'var(--text-muted)', textTransform: 'uppercase', lineHeight: 1, marginBottom: 4 }}>Warhammer · Age of Sigmar</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-              {/* Rune diamond mark */}
-              <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style={{ flexShrink: 0 }}>
-                <polygon points="12,2 22,12 12,22 2,12" fill="none" stroke="var(--accent)" strokeWidth="1.8"/>
-                <polygon points="12,6 18,12 12,18 6,12" fill="var(--accent)" opacity="0.35"/>
-                <circle cx="12" cy="12" r="2.2" fill="var(--accent)"/>
-              </svg>
-              <div style={{ fontFamily: 'Cinzel,serif', fontSize: 16, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.08em', textTransform: 'uppercase', lineHeight: 1 }}>AOS Lumineth Tracker</div>
+          <div style={{ flex: '0 0 auto', marginRight: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
+            {/* Diamond rune mark — gold in light, blue accent in dark */}
+            <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style={{ flexShrink: 0 }}>
+              <polygon points="12,2 22,12 12,22 2,12" fill="none"
+                stroke={theme === 'dark' ? 'var(--accent)' : '#c9a227'} strokeWidth="1.8"/>
+              <polygon points="12,6 18,12 12,18 6,12"
+                fill={theme === 'dark' ? 'var(--accent)' : '#c9a227'} opacity="0.35"/>
+              <circle cx="12" cy="12" r="2.2"
+                fill={theme === 'dark' ? 'var(--accent)' : '#c9a227'}/>
+            </svg>
+            <div style={{ fontFamily: 'Cinzel,serif', fontSize: 16, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', lineHeight: 1,
+              color: theme === 'dark' ? '#ffffff' : 'var(--accent)' }}>
+              AOS Lumineth Tracker
             </div>
           </div>
 
